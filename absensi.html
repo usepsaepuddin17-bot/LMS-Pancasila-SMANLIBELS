@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jurnal Absensi Kelas - SMAN 15 Maluku Tengah</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f4f6f9; min-height: 100vh; width: 100%; }
+        .page-wrapper { display: flex; justify-content: center; align-items: flex-start; padding: 15px 10px 30px 10px; width: 100%; }
+        .absensi-container { background-color: #ffffff; width: 100%; max-width: 480px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); overflow: hidden; border: 3px solid #3182ce; }
+        .absensi-header { background: linear-gradient(135deg, #3182ce 0%, #1a365d 100%); color: white; padding: 20px 15px; display: flex; align-items: center; gap: 15px; }
+        .btn-kembali { background: rgba(255, 255, 255, 0.2); border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-weight: bold; font-size: 16px; flex-shrink: 0; }
+        .header-title h1 { font-size: 16px; font-weight: 700; line-height: 1.2; }
+        .header-title p { font-size: 11px; opacity: 0.9; margin-top: 2px; }
+        .form-absensi { padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 12px; font-weight: 600; color: #4a5568; }
+        .form-control { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; color: #2d3748; outline: none; background-color: #f8fafc; -webkit-appearance: none; appearance: none; }
+        .form-control:disabled { opacity: 0.6; background-color: #edf2f7; }
+        .daftar-siswa-box { display: flex; flex-direction: column; gap: 12px; margin-top: 5px; }
+        .siswa-row { background: #ffffff; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .siswa-nama { font-size: 14px; font-weight: 600; color: #2d3748; }
+        .status-opsi-mini { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .status-opsi-mini label { position: relative; }
+        .status-opsi-mini input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+        .status-label-mini { display: flex; align-items: center; justify-content: center; padding: 8px 4px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 11px; font-weight: 700; color: #718096; cursor: pointer; text-align: center; background: #fff; }
+        .status-opsi-mini input[value="Hadir"]:checked + .status-label-mini { background: #ebf8ff; border-color: #3182ce; color: #2b6cb0; }
+        .status-opsi-mini input[value="Sakit"]:checked + .status-label-mini { background: #fffaf0; border-color: #dd6b20; color: #dd6b20; }
+        .status-opsi-mini input[value="Izin"]:checked + .status-label-mini { background: #f0fff4; border-color: #38a169; color: #38a169; }
+        .status-opsi-mini input[value="Alpa"]:checked + .status-label-mini { background: #fff5f5; border-color: #e53e3e; color: #e53e3e; }
+        .btn-submit { background-color: #22c55e; color: white; border: none; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 15px; box-shadow: 0 4px 6px rgba(34, 197, 94, 0.2); }
+        .btn-submit:disabled { background-color: #a0aec0; cursor: not-allowed; box-shadow: none; }
+        .rekap-mini { margin: 5px 15px 20px 15px; background-color: #f7fafc; border-radius: 12px; padding: 12px; border: 1px solid #e2e8f0; }
+        .rekap-mini h3 { font-size: 12px; color: #4a5568; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .rekap-grid { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; gap: 5px; }
+        .rekap-box { padding: 6px; border-radius: 6px; background: white; }
+        .rekap-num { font-size: 14px; font-weight: 700; }
+        .rekap-lbl { font-size: 9px; color: #718096; font-weight: 500; }
+        .loading-text { font-size: 11px; color: #3182ce; font-style: italic; display: none; }
+    </style>
+</head>
+<body>
+    
+    <div class="page-wrapper">
+        <div class="absensi-container">
+            <div class="absensi-header">
+                <a href="admin.html" class="btn-kembali">&#10094;</a>
+                <div class="header-title">
+                    <h1>JURNAL ABSENSI KELAS</h1>
+                    <p>Pendidikan Pancasila - SMAN 15 Maluku Tengah</p>
+                </div>
+            </div>
+            
+            <form class="form-absensi" id="formAbsen">
+                <div class="form-group">
+                    <label for="tanggal">Tanggal KBM</label>
+                    <input type="date" id="tanggal" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="kelas">Pilih Kelas</label>
+                    <!-- Bersih total. Tidak ada opsi kelas manual di sini. Murni dikendalikan Google Sheet -->
+                    <select id="kelas" class="form-control" required disabled>
+                        <option value="">-- Memuat Kelas dari Google Sheet... --</option>
+                    </select>
+                    <span id="loadingKelas" class="loading-text" style="display:inline;">🔄 Menghubungkan ke Google Sheet...</span>
+                </div>
+                
+                <div class="form-group" id="boxSiswaContainer" style="display:none;">
+                    <label>Daftar Hadir Siswa (Default: Hadir)</label>
+                    <span id="loadingSiswa" class="loading-text">🔄 Mengambil daftar siswa kelas...</span>
+                    <div class="daftar-siswa-box" id="daftarSiswa"></div>
+                </div>
+                
+                <button type="submit" id="btnKirim" class="btn-submit" disabled>KIRIM SEMUA DATA ABSENSI</button>
+            </form>
+
+            <div class="rekap-mini" id="boxRekapMini" style="display:none;">
+                <h3>Ringkasan Kelas (<span id="kelas-terpilih">-</span>)</h3>
+                <div class="rekap-grid">
+                    <div class="rekap-box"><div class="rekap-num" id="stat-hadir" style="color: #3182ce;">0</div><div class="rekap-lbl">Hadir</div></div>
+                    <div class="rekap-box"><div class="rekap-num" id="stat-sakit" style="color: #dd6b20;">0</div><div class="rekap-lbl">Sakit</div></div>
+                    <div class="rekap-box"><div class="rekap-num" id="stat-izin" style="color: #38a169;">0</div><div class="rekap-lbl">Izin</div></div>
+                    <div class="rekap-box"><div class="rekap-num" id="stat-alpa" style="color: #e53e3e;">0</div><div class="rekap-lbl">Alpa</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 🚀 MASUKKAN LINK URL DEPLOY APPS SCRIPT ANDA DI SINI
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnWrksg3ZcsKNREjcsJmelvPcmbYU4APCC_laZXyR0ZMR-6oa-xh_oUAD07xFEh3qI/exec";
+
+        document.getElementById('tanggal').valueAsDate = new Date();
+
+        const elTanggal = document.getElementById('tanggal');
+        const elKelas = document.getElementById('kelas');
+        const elDaftarSiswa = document.getElementById('daftarSiswa');
+        const boxSiswaContainer = document.getElementById('boxSiswaContainer');
+        const boxRekapMini = document.getElementById('boxRekapMini');
+        const btnKirim = document.getElementById('btnKirim');
+
+        function hitungKalkulasiKelas() {
+            let h = 0, s = 0, i = 0, a = 0;
+            const rows = document.querySelectorAll('.siswa-row');
+            rows.forEach((row, idx) => {
+                const val = row.querySelector(`input[name="status_${idx}"]:checked`).value;
+                if (val === "Hadir") h++; else if (val === "Sakit") s++; else if (val === "Izin") i++; else if (val === "Alpa") a++;
+            });
+            document.getElementById('stat-hadir').innerText = h;
+            document.getElementById('stat-sakit').innerText = s;
+            document.getElementById('stat-izin').innerText = i;
+            document.getElementById('stat-alpa').innerText = a;
+        }
+
+        // KELAS DIAMBIL 100% DINAMIS DARI HASIL PEMBACAAN GOOGLE SHEET
+        async function muatDaftarKelasOtomatis() {
+            try {
+                const respon = await fetch(`${GOOGLE_SCRIPT_URL}?action=getKelasOnly`);
+                const dataKelas = await respon.json();
+                
+                elKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+                dataKelas.forEach(kelas => { elKelas.innerHTML += `<option value="${kelas}">${kelas}</option>`; });
+                elKelas.disabled = false;
+                document.getElementById('loadingKelas').style.display = 'none';
+            } catch (e) {
+                document.getElementById('loadingKelas').innerText = "❌ Server Sheet terputus.";
+            }
+        }
+        window.addEventListener('DOMContentLoaded', muatDaftarKelasOtomatis);
+
+        async function muatSiswaMassal() {
+            const kelas = elKelas.value;
+            if (!kelas) { boxSiswaContainer.style.display = 'none'; boxRekapMini.style.display = 'none'; btnKirim.disabled = true; return; }
+
+            boxSiswaContainer.style.display = 'block';
+            boxRekapMini.style.display = 'block';
+            document.getElementById('kelas-terpilih').innerText = kelas;
+            document.getElementById('loadingSiswa').style.display = 'inline';
+            elDaftarSiswa.innerHTML = '';
+            btnKirim.disabled = true;
+
+            try {
+                const respon = await fetch(`${GOOGLE_SCRIPT_URL}?action=getData&kelas=${encodeURIComponent(kelas)}`);
+                const data = await respon.json();
+
+                if (data.siswa && data.siswa.length > 0) {
+                    data.siswa.forEach((namaSiswa, indeks) => {
+                        elDaftarSiswa.innerHTML += `
+                            <div class="siswa-row" data-nama="${namaSiswa}">
+                                <div class="siswa-nama">${indeks + 1}. ${namaSiswa}</div>
+                                <div class="status-opsi-mini">
+                                    <label><input type="radio" name="status_${indeks}" value="Hadir" checked> <div class="status-label-mini">HADIR</div></label>
+                                    <label><input type="radio" name="status_${indeks}" value="Sakit"> <div class="status-label-mini">SAKIT</div></label>
+                                    <label><input type="radio" name="status_${indeks}" value="Izin"> <div class="status-label-mini">IZIN</div></label>
+                                    <label><input type="radio" name="status_${indeks}" value="Alpa"> <div class="status-label-mini">ALPA</div></label>
+                                </div>
+                                
+                            </div>`;
+                    });
+                    
+                    hitungKalkulasiKelas();
+                    document.querySelectorAll('.status-opsi-mini input[type="radio"]').forEach(radio => {
+                        radio.addEventListener('change', hitungKalkulasiKelas);
+                    });
+                    btnKirim.disabled = false;
+                } else {
+                    elDaftarSiswa.innerHTML = '<p style="font-size:12px; color:#e53e3e;">Tidak ada data siswa.</p>';
+                    boxRekapMini.style.display = 'none';
+                }
+            } catch (error) {
+                alert("Gagal memuat list nama siswa.");
+            } finally {
+                document.getElementById('loadingSiswa').style.display = 'none';
+            }
+        }
+        elKelas.addEventListener('change', muatSiswaMassal);
+
+        document.getElementById('formAbsen').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            btnKirim.disabled = true;
+            btnKirim.innerText = "⏳ MENYIMPAN KE GOOGLE SHEET...";
+
+            const arrayDataAbsen = [];
+            document.querySelectorAll('.siswa-row').forEach((row, indeks) => {
+                const nama = row.getAttribute('data-nama');
+                const status = row.querySelector(`input[name="status_${indeks}"]:checked`).value;
+                arrayDataAbsen.push({ nama: nama, status: status });
+            });
+
+            const payload = { action: "simpanAbsenMassal", tanggal: elTanggal.value, kelas: elKelas.value, dataAbsen: arrayDataAbsen };
+
+            try {
+                const respon = await fetch(GOOGLE_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+                const hasil = await respon.json();
+                if (hasil.status === "success") {
+                    alert(`✅ Sukses! Jurnal Absensi Kelas ${payload.kelas} berhasil disimpan.`);
+                    elKelas.value = "";
+                    boxSiswaContainer.style.display = 'none';
+                    boxRekapMini.style.display = 'none';
+                } else { alert("⚠️ Gagal: " + hasil.message); }
+            } catch (err) { alert("❌ Kendala jaringan."); } 
+            finally { btnKirim.disabled = false; btnKirim.innerText = "KIRIM SEMUA DATA ABSENSI"; }
+        });
+        
+    // Menunggu hingga seluruh halaman selesai dimuat
+    document.addEventListener("DOMContentLoaded", function() {
+        // Mengambil elemen input berdasarkan id="tanggal" yang Anda miliki
+        const inputTanggal = document.getElementById("tanggal");
+        
+        // Mengambil data waktu lokal dari perangkat (Laptop/HP)
+        const hariIni = new Date();
+        
+        // Memformat tanggal ke format standar HTML (YYYY-MM-DD)
+        const tahun = hariIni.getFullYear();
+        const bulan = String(hariIni.getMonth() + 1).padStart(2, '0'); // Ditambah 1 karena Januari dimulai dari 0
+        const tanggal = String(hariIni.getDate()).padStart(2, '0');
+        
+        const tanggalFormatHTML = `${tahun}-${bulan}-${tanggal}`;
+        
+        // Memasukkan tanggal hari ini secara otomatis ke dalam kotak input
+        inputTanggal.value = tanggalFormatHTML;
+    });
+    </script>
+</body>
+</html>

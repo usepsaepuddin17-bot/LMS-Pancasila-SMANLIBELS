@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS Pendidikan Pancasila - SMAN 15 Maluku Tengah</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .lms-container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 3px solid #1a5f7a;
+            margin-top: 10px;
+        }
+
+        .lms-header {
+            background: linear-gradient(135deg, #1a5f7a 0%, #103f52 100%);
+            color: white;
+            text-align: center;
+            padding: 25px 15px;
+        }
+
+        .garuda-logo {
+            width: 75px;
+            height: auto;
+            margin-bottom: 12px;
+        }
+
+        .lms-header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .lms-header h2 {
+            font-size: 15px;
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .badge-mapel {
+            background-color: #f45050;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .guru-info {
+            font-size: 11px;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .lms-menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 20px 15px;
+            background-color: #ffffff;
+        }
+
+        .menu-card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            text-decoration: none;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .icon-wrapper {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .icon-wrapper svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
+        /* Perbaikan Kelas CSS agar sesuai dengan Menu HTML */
+        .card-absensi { border-left: 6px solid #3182ce; }
+        .card-absensi .icon-wrapper { background-color: #3182ce; }
+
+        .card-rekap { border-left: 6px solid #22c55e; }
+        .card-rekap .icon-wrapper { background-color: #22c55e; }
+
+        .card-monitoring { border-left: 6px solid #f43f5e; }
+        .card-monitoring .icon-wrapper { background-color: #f43f5e; }
+
+        .menu-info {
+            text-align: left;
+        }
+
+        .menu-info h3 {
+            font-size: 15px;
+            color: #1e293b;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .menu-info p {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lms-container">
+        <div class="lms-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Garuda_Pancasila%2C_Coat_of_Arms_of_Indonesia.svg" alt="Garuda Pancasila" class="garuda-logo">
+            <h1>LMS PENDIDIKAN PANCASILA</h1>
+            <h2>SMAN 15 Maluku Tengah</h2>
+            <div class="badge-mapel">ADMIN (GURU MATA PELAJARAN)</div>
+            <div class="guru-info">Usep Saepudin, M.Pd.</div>
+        </div>
+
+        <div class="lms-menu-list">
+            
+            <!-- Menu Absensi -->
+            <a href="absensi.html" class="menu-card card-absensi">
+                <div class="icon-wrapper">
+                    <!-- Ikon Clipboard / Absensi -->
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+                    </svg>
+                </div>
+                <div class="menu-info">
+                    <h3>ABSENSI KEHADIRAN</h3>
+                    <p>Cek Kehadiran Siswa dalam PBM.</p>
+                </div>
+            </a>
+
+            <!-- Menu Rekap Nilai -->
+            <a href="rekap.html" class="menu-card card-rekap">
+                <div class="icon-wrapper">
+                    <!-- Ikon Analisis / Rekap Nilai -->
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                </div>
+                <div class="menu-info">
+                    <h3>REKAP NILAI</h3>
+                    <p>REKAP NILAI LATIHAN, LKPD DAN ABSENSI</p>
+                </div>
+            </a>
+
+            <!-- Menu Monitoring Guru -->
+            <a href="monitoring.html" class="menu-card card-monitoring">
+                <div class="icon-wrapper">
+                    <!-- Ikon Layar Monitor Pantauan / Monitoring -->
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm-1 14H4c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h16c.55 0 1 .45 1 1v10c0 .55-.45 1-1 1zm-9-4l-3-3 1.41-1.41L11 10.17l4.59-4.59L17 7l-6 6z"/>
+                    </svg>
+                </div>
+                <div class="menu-info">
+                    <h3>Monitoring Guru</h3>
+                    <p>Monitoring Guru dalam Pelaksanaan PBM (Penyelesaian Tugas/Evaluasi)</p>
+                </div>
+            </a>
+            <div class="lms-container">
+        <div class="lms-header">
+           <a href="../index.html" class="btn-back">← Kembali</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

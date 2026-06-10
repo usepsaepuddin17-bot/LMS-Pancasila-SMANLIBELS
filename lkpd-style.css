@@ -1,0 +1,192 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+body {
+    background-color: #f1f5f9;
+    color: #1e293b;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+/* Ukuran Kontainer Pas Seukuran Layar HP Android/iOS */
+.lkpd-mobile-box {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 480px; 
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border: 2px solid #1a5f7a;
+    margin-bottom: 20px;
+}
+.lkpd-header {
+    background: linear-gradient(135deg, #1a5f7a 0%, #103f52 100%);
+    color: white;
+    padding: 12px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+}
+.sub-header {
+    font-size: 11px; 
+    font-weight: 400; 
+    opacity: 0.9;
+}
+
+/* AREA MATERI (ATAS) */
+.area-materi-hp {
+    padding: 12px;
+    border-bottom: 2px solid #f1f5f9;
+}
+/* Style Tab Geser Horisontal (Mulus di Layar Sentuh HP) */
+.tab-navigation {
+    display: none;
+    overflow-x: auto;
+    background-color: #f1f5f9;
+    padding: 6px;
+    gap: 6px;
+    margin-top: 10px;
+    border-radius: 8px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+.tab-navigation::-webkit-scrollbar {
+    display: none; /* Sembunyikan scrollbar agar rapi seperti aplikasi natif */
+}
+.tab-btn {
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    background-color: #ffffff;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    border-radius: 15px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.tab-btn.active {
+    background-color: #1a5f7a;
+    color: white;
+    border-color: #1a5f7a;
+}
+.box-konten-materi {
+    padding: 12px;
+    margin-top: 10px;
+    background-color: #fafafa;
+    border-left: 3px solid #1a5f7a;
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    max-height: 220px; /* Dibatasi agar layar HP tidak terlalu panjang ke bawah */
+    overflow-y: auto;
+    white-space: pre-wrap;
+    text-align: justify;
+    line-height: 1.5;
+}
+
+/* AREA INPUT DATA & FORM (BAWAH) */
+.area-input-hp {
+    padding: 12px;
+    background-color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+.form-group label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+}
+.form-control {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #1e293b;
+    outline: none;
+}
+.form-control:focus {
+    border-color: #1a5f7a;
+}
+.form-control:disabled {
+    background-color: #e2e8f0;
+    color: #64748b;
+}
+textarea.form-control {
+    resize: none;
+}
+
+/* TOMBOL & BADGE KHUSUS HP */
+.btn-lock-id {
+    width: 100%;
+    background-color: #1a5f7a;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.btn-submit-lkpd {
+    width: 100%;
+    background-color: #22c55e;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.btn-submit-lkpd:disabled {
+    background-color: #cbd5e1;
+    color: #94a3b8;
+}
+.pembatas-garis {
+    border-top: 1px dashed #cbd5e1;
+    margin: 2px 0;
+}
+.status-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 5px;
+    border-radius: 4px;
+    text-align: center;
+    display: none;
+}
+.status-locked {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+/* GAYA BARU AGAR TEKS HTML DARI GOOGLE DOCS TERLIHAT INDAH */
+.box-konten-materi h1, .box-konten-materi h2, .box-konten-materi h3 {
+    color: #1a5f7a;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+.box-konten-materi p {
+    margin-bottom: 10px;
+    color: #334155;
+}
+.box-konten-materi ul, .box-konten-materi ol {
+    margin-left: 20px;
+    margin-bottom: 10px;
+    padding-left: 5px;
+}
+.box-konten-materi li {
+    margin-bottom: 4px;
+}

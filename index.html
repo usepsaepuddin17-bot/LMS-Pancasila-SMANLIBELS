@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS Pendidikan Pancasila - SMAN 15 Maluku Tengah</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .lms-container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 3px solid #1a5f7a;
+            margin-top: 10px;
+        }
+
+        .lms-header {
+            background: linear-gradient(135deg, #1a5f7a 0%, #103f52 100%);
+            color: white;
+            text-align: center;
+            padding: 25px 15px;
+        }
+
+        .garuda-logo {
+            width: 75px;
+            height: auto;
+            margin-bottom: 12px;
+        }
+
+        .lms-header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .lms-header h2 {
+            font-size: 15px;
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .badge-mapel {
+            background-color: #f45050;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .guru-info {
+            font-size: 11px;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .lms-menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 20px 15px;
+            background-color: #ffffff;
+        }
+
+        .menu-card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            text-decoration: none; /* Menghilangkan garis bawah tautan */
+            width: 100%;
+        }
+
+        .icon-wrapper {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .icon-wrapper svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
+        .card-latihan { border-left: 6px solid #3182ce; }
+        .card-latihan .icon-wrapper { background-color: #3182ce; }
+
+        .card-lkpd { border-left: 6px solid #22c55e; }
+        .card-lkpd .icon-wrapper { background-color: #22c55e; }
+
+        .card-admin { border-left: 6px solid #f43f5e; }
+        .card-admin .icon-wrapper { background-color: #f43f5e; }
+
+        .menu-info {
+            text-align: left;
+        }
+
+        .menu-info h3 {
+            font-size: 15px;
+            color: #1e293b;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .menu-info p {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lms-container">
+        <div class="lms-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Garuda_Pancasila%2C_Coat_of_Arms_of_Indonesia.svg" alt="Garuda Pancasila" class="garuda-logo" alt="Garuda Pancasila" class="garuda-logo">
+            <h1>LMS PENDIDIKAN PANCASILA</h1>
+            <h2>SMAN 15 Maluku Tengah</h2>
+            <div class="badge-mapel">Materi Tatap Muka & Ujian</div>
+            <div class="guru-info">Guru: Usep Saepudin, S.Pd.</div>
+        </div>
+
+        <!-- MENU UTAMA SEBAGAI PINTU PEMBUKA KE FILE LAIN -->
+        <div class="lms-menu-list">
+            
+            <!-- Mengarah ke file latihan_soal.html -->
+            <a href="latihan_soal.html" class="menu-card card-latihan">
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                </div>
+                <div class="menu-info">
+                    <h3>Latihan Soal (CBT)</h3>
+                    <p>Mengerjakan ujian pilihan ganda per pertemuan secara online.</p>
+                </div>
+            </a>
+
+            <!-- Mengarah ke file lkpd.html -->
+            <a href="lkpd/lkpd.html" class="menu-card card-lkpd">
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5.48 13.29l-3.22-1.76L12 18l8.24-4.5-3.22 1.76L12 20l-6.52-6.71z"/></svg>
+                </div>
+                <div class="menu-info">
+                    <h3>Isi LKPD</h3>
+                    <p>Lembar Kerja Peserta Didik dan pengisian tugas mandiri.</p>
+                </div>
+            </a>
+
+            <!-- Mengarah ke file admin.html -->
+            <!-- Buka index.html dan pastikan bagian href ini benar -->
+        <a href="admin/admin.html" class="menu-card card-admin">
+            <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3-1.57-3-3.5s1.07-3.5 3-3.5 3 1.57 3 3.5-1.07 3.5-3 3.5z"/></svg>
+            </div>
+            <div class="menu-info">
+                <h3>Panel Admin / Guru</h3>
+                <p>Rekapitulasi nilai siswa dan pengaturan link Google Docs.</p>
+            </div>
+        </a>
+        <!-- MENU BARU: Panel Keluar Aplikasi -->
+            <div class="menu-card card-keluar" onclick="tutupAplikasi()">
+                <div class="icon-wrapper">
+                    <!-- Ikon Tombol Power / Keluar -->
+                    <svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                </div>
+                <div class="menu-info">
+                    <h3>Keluar Aplikasi</h3>
+                    <p>Menutup halaman sistem pembelajaran LMS.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    function tutupAplikasi() {
+        const konfirmasi = confirm("Apakah Anda yakin ingin keluar dari LMS Pendidikan Pancasila?");
+        if (konfirmasi) {
+            // Langsung alihkan keluar dari sistem menuju Google
+            window.location.href = "https://google.com";
+        }
+    }
+</script>
+</body>
+</html>

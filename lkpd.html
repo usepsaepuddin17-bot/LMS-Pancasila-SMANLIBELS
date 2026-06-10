@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LKPD Mobile - LMS Pancasila</title>
+    <!-- Google Font -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    <!-- Hubungkan ke CSS HP -->
+    <link rel="stylesheet" href="lkpd-style.css">
+</head>
+<body>
+
+<div class="lkpd-mobile-box">
+    <!-- Header Atas Aplikasi -->
+     <a href="../index.html" class="btn-back">← Kembali</a>
+    <div class="lkpd-header">
+        Lembar Kerja Peserta Didik (LKPD)<br>
+        <span class="sub-header">PPKn | SMAN 15 Maluku Tengah</span>
+        </div>
+        
+       
+    
+
+    <!-- BAGIAN 1: PENGATURAN UTAMA & TAB MATERI (BAGIAN ATAS HP) -->
+    <div class="area-materi-hp">
+        <div class="form-group" style="padding: 0 5px;">
+            <label>Pilih Bab Pertemuan</label>
+            <select class="form-control" id="pilihLkpd" onchange="muatStrukturGoogleDoc()">
+                <option value="">-- Pilih Pembahasan LKPD --</option>
+            </select>
+        </div>
+
+        <!-- Navigasi Tab Geser yang Sangat Lancar di Layar Sentuh HP -->
+         <div class="tab-navigation" id="areaTab" style="display: flex;">
+            <button class="tab-btn active" id="btnMateriUtama" onclick="gantiPanel('utama')">MATERI UTAMA</button>
+            <button class="tab-btn" id="btnMateriTambahan" onclick="gantiPanel('tambahan')">MATERI TAMBAHAN</button>
+            <button class="tab-btn" id="btnLembarKerja" onclick="gantiPanel('kerja')">LEMBAR KERJA</button>
+        </div>
+
+        <!-- Kotak Bacaan Materi/Soal dari Google Doc -->
+        <div class="box-konten-materi" id="isiDoc">
+            Silakan pilih bab pertemuan di atas untuk menarik lembar kerja kelompok langsung dari Google Docs Guru.
+        </div>
+    </div>
+
+    <!-- BAGIAN 2: IDENTITAS KELOMPOK & JAWABAN (BAGIAN BAWAH HP) -->
+    <div class="area-input-hp">
+        <!-- Notifikasi Kunci Sistem -->
+        <div id="badgeStatusIdentitas" class="status-badge status-locked">Identitas Terkunci di Server</div>
+        
+               <!-- Pilihan Kelas (Dropdown Dinamis) -->
+        <div class="form-group">
+            <label>Kelas</label>
+            <select class="form-control" id="pilihKelas" onchange="muatDaftarSiswaPerKelas()">
+                <option value="">-- Pilih Kelas --</option>
+            </select>
+        </div>
+
+        <!-- Pilihan Anggota Kelompok (Dropdown Terfilter Otomatis) -->
+        <div class="form-group" id="areaDropdownAnggota">
+            <label>Nama Anggota Kelompok</label>
+            <select class="form-control opsi-nama-siswa" id="anggota1" style="margin-bottom: 5px;"><option value="">-- Pilih Anggota 1 --</option></select>
+            <select class="form-control opsi-nama-siswa" id="anggota2" style="margin-bottom: 5px;"><option value="">-- Pilih Anggota 2 --</option></select>
+            <select class="form-control opsi-nama-siswa" id="anggota3" style="margin-bottom: 5px;"><option value="">-- Pilih Anggota 3 --</option></select>
+            <select class="form-control opsi-nama-siswa" id="anggota4" style="margin-bottom: 5px;"><option value="">-- Pilih Anggota 4 --</option></select>
+            <select class="form-control opsi-nama-siswa" id="anggota5" style="margin-bottom: 5px;"><option value="">-- Pilih Anggota 5 --</option></select>
+            <select class="form-control opsi-nama-siswa" id="anggota6" style="margin-bottom: 5px;"><option value="">-- Pilih Anggota 6 --</option></select>
+        </div>
+
+        <!-- Tombol Tahap 1 -->
+        <button type="button" class="btn-lock-id" id="btnKunciIdentitas" onclick="kirimBagianIdentitas()">1. Kunci & Daftarkan Kelompok</button>
+        
+        <div class="pembatas-garis"></div>
+
+        <div class="form-group">
+            <label>Tuliskan Hasil Diskusi / Jawaban Kelompok</label>
+            <textarea class="form-control" id="jawabanTugas" style="height: 120px;" placeholder="Kunci identitas kelompok di atas terlebih dahulu untuk membuka kotak ketik jawaban..." disabled></textarea>
+        </div>
+
+        <!-- Tombol Tahap 2 -->
+        <button class="btn-submit-lkpd" id="btnKirimJawaban" onclick="kirimBagianJawaban()" disabled>2. Kirim Lembar Jawaban</button>
+    </div>
+</div>
+
+<!-- Hubungkan ke JS Engine -->
+<script src="lkpd-script.js"></script>
+</body>
+</html>
