@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor Pengawas SMAN 15 Maluku Tengah</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        /* 1. Pengaturan Dasar Halaman Mobile-First */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', -apple-system, sans-serif; }
+        body { background-color: #f1f5f9; padding: 12px; color: #1e293b; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+        
+        /* 2. Pembungkus Utama Aplikasi Pengawas */
+        .monitor-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; margin-top: 5px; }
+        
+        /* 3. Desain Banner Atas (Kop Sekolah) */
+        .monitor-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; text-align: center; padding: 22px 15px; border-bottom: 4px solid #3b82f6; }
+        .monitor-header .school-name { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #94a3b8; margin-bottom: 3px; text-transform: uppercase; }
+        .monitor-header h1 { font-size: 17px; font-weight: 700; color: #ffffff; }
+        
+        /* 4. Desain Kotak Panel Kontrol Pengawas (GPS & Filter Kelas) */
+        .control-panel { background: #f8fafc; padding: 15px; margin: 15px; border-radius: 14px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 12px; }
+        .panel-block { display: flex; flex-direction: column; gap: 6px; }
+        .panel-title { font-size: 12px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 5px; }
+        .control-panel select { width: 100%; padding: 11px; border-radius: 8px; border: 2px solid #cbd5e1; font-size: 13px; font-weight: 600; color: #334155; outline: none; background-color: white; transition: all 0.2s; }
+        .control-panel select:focus { border-color: #3b82f6; }
+        
+        /* Tombol Set Kunci GPS Ruangan & Tombol Unduh Laporan */
+        .btn-lock-gps { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; text-align: center; box-shadow: 0 4px 12px rgba(59,130,246,0.1); transition: all 0.2s; }
+        .btn-lock-gps:active { transform: scale(0.98); }
+        .btn-lock-gps:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
+        
+        .btn-download-pdf { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; text-align: center; box-shadow: 0 4px 12px rgba(16,185,129,0.2); transition: all 0.2s; margin-top: 5px; width: 100%; display: block; }
+        .btn-download-pdf:active { transform: scale(0.98); }
+
+        /* 5. Bar Indikator Status Hubungan Server */
+        .sync-bar { margin: 0 15px 15px 15px; padding: 8px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; text-align: center; background-color: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; transition: all 0.3s; }
+        
+        /* 6. Area Utama Pemantauan Riwayat Peserta */
+        .monitor-body { padding: 0 15px 20px 15px; display: flex; flex-direction: column; gap: 12px; }
+        .section-subtitle { font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 2px; padding-left: 2px; }
+
+        /* 7. Desain Tabel Pengawasan Responsif Mobile */
+        .table-responsive { width: 100%; overflow-x: hidden; border: 1px solid #e2e8f0; border-radius: 12px; background: white; }
+        .monitor-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; table-layout: fixed; }
+        
+        /* RASIO LEBAR KOLOM TERBARU (Sesuai Permintaan: Kolom Nama Dipersempit, Kolom Crg Diperlebar) */
+        .monitor-table th:nth-child(1), .monitor-table td:nth-child(1) { width: 42%; } /* Kolom Nama */
+        .monitor-table th:nth-child(2), .monitor-table td:nth-child(2) { width: 28%; text-align: center; } /* Kolom Status */
+        .monitor-table th:nth-child(3), .monitor-table td:nth-child(3) { width: 12%; text-align: center; } /* Kolom Nilai */
+        .monitor-table th:nth-child(4), .monitor-table td:nth-child(4) { width: 18%; text-align: center; } /* Kolom Crg */
+
+        .monitor-table th { background-color: #f8fafc; color: #475569; font-weight: 700; padding: 12px 6px; border-bottom: 2px solid #e2e8f0; }
+        .monitor-table td { padding: 12px 6px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #334155; }
+        .monitor-table tr:hover { background-color: #f8fafc; }
+        
+        /* Komponen Detail Nama Siswa Dalam Tabel */
+        .td-name-block { font-weight: 700; color: #0f172a; word-break: break-word; line-height: 1.3; }
+        .td-sub-info { font-size: 10px; color: #64748b; font-weight: 500; margin-top: 2px; }
+
+        /* Gaya Lencana Status Ujian & Alarm Kecurangan */
+        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; color: white; display: inline-block; text-align: center; white-space: nowrap; }
+        .cheat-badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-block; }
+
+        .score-text { font-size: 15px; font-weight: 800; color: #0f172a; text-align: center; display: block; }
+        
+        /* 8. ELEMEN KHUSUS DOKUMEN CETAK PDF */
+        /* Ganti ini */
+        /* GANTI KODE INI */
+            #pdf-export-area { 
+            display: none; 
+            width: 100%;             /* KOREKSI: Mengikuti lebar printable area pdf */
+            max-width: 180mm;        /* KOREKSI: Pas dengan sisa ruang A4 setelah dipotong margin */
+            background: white; 
+            color: #000000; 
+            padding: 20px 10px;      /* KOREKSI: Diperkecil agar tabel tidak terlalu tertekan ke dalam */
+            }
+
+        .pdf-header { text-align: center; border-bottom: 3px double #000000; padding-bottom: 12px; margin-bottom: 20px; }
+        .pdf-header .instansi { font-size: 14px; font-weight: 800; letter-spacing: 1px; }
+        .pdf-header .judul-dokumen { font-size: 18px; font-weight: 800; margin-top: 5px; text-transform: uppercase; }
+        .pdf-meta-table { width: 100%; margin-bottom: 20px; font-size: 12px; }
+        .pdf-meta-table td { padding: 4px 0; border: none !important; font-weight: 600; }
+        .pdf-main-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+        .pdf-main-table th, .pdf-main-table td { border: 1px solid #000000 !important; padding: 10px; text-align: left; color: #000000 !important; }
+        .pdf-main-table th { background-color: #f2f2f2 !important; font-weight: 700; text-align: center; }
+
+        @keyframes neonPulse {
+            0% { box-shadow: 0 0 2px #ef4444; opacity: 0.9; }
+            100% { box-shadow: 0 0 6px #ef4444; opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="monitor-container">
+        <div class="monitor-header">
+            <div class="school-name">SMA Negeri 15 Maluku Tengah</div>
+            <h1>🖥️ Pemantauan Real-time Pengawas</h1>
+        </div>
+        
+        <div class="control-panel">
+            <div class="panel-block">
+                <div class="panel-title">📍 Set Lokasi Ruang Ujian Otomatis:</div>
+                <select id="select-paket-gps">
+                    <option value="">-- Memuat Paket Asesmen... --</option>
+                </select>
+                <button class="btn-lock-gps" id="btn-kunci-lokasi" onclick="kunciLokasiRuanganGuru()">Kunci Koordinat Ruangan Ini</button>
+            </div>
+            
+            <div class="panel-block" style="border-top: 1px solid #e2e8f0; padding-top: 10px;">
+                <div class="panel-title">🔍 Filter Kelas Pengawasan:</div>
+                <select id="filter-kelas-pengawas" onchange="jalankanFilterKelasSiswa()">
+                    <option value="SEMUA">-- Tampilkan Semua Kelas --</option>
+                </select>
+                 <!-- --- TAMBAHAN KOTAK INPUT NAMA PENGAWAS --- -->
+                <div class="panel-title" style="margin-top: 8px;"> Nama Pengawas Ruang:</div>
+                <input type="text" id="input-nama-pengawas" placeholder="Ketik nama pengawas di sini..." style="width: 100%; padding: 11px; border-radius: 8px; border: 2px solid #cbd5e1; font-size: 13px; font-weight: 600; color: #334155; outline: none; margin-bottom: 5px;" value="Pengawas Ruang Ujian">
+                <!-- ----------------------------------------- -->
+
+                <button class="btn-download-pdf" onclick="eksporLaporanUjianKePDF()">📥 Unduh Berkas Laporan PDF</button>
+            </div>
+        </div>
+
+        <div class="sync-bar" id="connection-status"> Menyambungkan ke Google Sheets...</div>
+        
+        <div class="monitor-body">
+            <div class="section-subtitle" id="label-sub-daftar">Daftar Aktivitas Ujian Peserta:</div>
+            <div class="table-responsive">
+                <table class="monitor-table">
+                    <thead>
+                        <tr>
+                            <th>Nama Peserta & Kelas</th>
+                            <th style="text-align: center;">Status</th>
+                            <th style="text-align: center;">Nilai</th>
+                            <th style="text-align: center;">Crg</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monitor-table-body">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 25px;">Memuat riwayat aktivitas...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="pdf-export-area">
+        <div class="pdf-header">
+            <div class="instansi">PEMERINTAH PROVINSI MALUKU<br>DINAS PENDIDIKAN DAN KEBUDAYAAN<br>SMA NEGERI 15 MALUKU TENGAH</div>
+            <div class="judul-dokumen">LAPORAN MONITORING ASESMEN SUMATIF DIGITAL</div>
+        </div>
+        <table class="pdf-meta-table">
+            <tr>
+                <td style="width: 20%;">Mata Pelajaran</td>
+                <td style="width: 3%;">:</td>
+                <td style="width: 37%;" id="pdf-meta-mapel">Pendidikan Pancasila</td>
+                <td style="width: 18%;">Nama Pengawas</td>
+                <td style="width: 3%;">:</td>
+                <td style="width: 19%;" id="pdf-meta-pengawas">Pengawas Ruang Ujian</td>
+            </tr>
+            <tr>
+                <td>Kelas Pengawasan</td>
+                <td>:</td>
+                <td id="pdf-meta-kelas">Semua Kelas</td>
+                <td>Waktu Unduh</td>
+                <td>:</td>
+                <td id="pdf-meta-waktu">-</td>
+            </tr>
+        </table>
+            <table class="pdf-main-table" style="width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 15px; table-layout: fixed;">
+            <thead>
+                <tr style="background-color: #f1f5f9;">
+                <th style="width: 5%; text-align: center; padding: 8px; border: 1px solid #cbd5e1;">No</th>
+                <th style="width: 12%; text-align: center; padding: 8px; border: 1px solid #cbd5e1;">NISN</th>
+                <th style="width: 32%; text-align: left; padding: 8px; border: 1px solid #cbd5e1;">Nama Lengkap Peserta Didik</th>
+                <th style="width: 9%; text-align: center; padding: 8px; border: 1px solid #cbd5e1;">Kelas</th>
+                <th style="width: 17%; text-align: center; padding: 8px; border: 1px solid #cbd5e1;">Status Ujian</th>
+                <th style="width: 13%; text-align: center; padding: 8px; border: 1px solid #cbd5e1;">Kecurangan</th>
+                <th style="width: 12%; text-align: center; padding: 8px; border: 1px solid #cbd5e1;">Skor Akhir</th>
+                </tr>
+            </thead>
+            <tbody id="pdf-table-body">
+                <!-- Data akan dirender lewat JavaScript -->
+            </tbody>
+            </table>
+
+    </div>
+
+<script>
+    
+    // Tautan URL resmi Web App Google Apps Script Anda
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrrF-fNhUYcKUetVoalOT-Unrd2s8WuXVu_PCaagicTyiJgewnvgN1lgm7ty7zU0fNag/exec";
+
+    
+    let dataAsliSiswaCache = []; 
+    let dataLogCache = {}; // Tempat penyimpanan log terpisah agar terbaca real-time
+    let daftarKelasDitemukan = new Set(); 
+
+    // 1. FUNGSI UTAMA: MEMUAT DATA MONITOR REKAPITULASI SECARA REAL-TIME
+ async function muatDataMonitor() {
+    const statusBox = document.getElementById("connection-status");
+    const filterDropdown = document.getElementById("filter-kelas-pengawas");
+
+    try {
+        // 1. Ambil data dari Google Apps Script Web App
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=ambil_monitor`);
+        const hasil = await response.json();
+
+        // 2. Validasi status respon server
+        if (hasil.status !== "success") {
+            statusBox.innerHTML = "❌ Gagal sinkronisasi data dari spreadsheet.";
+            return;
+        }
+
+        // 3. Simpan data siswa induk ke dalam cache lokal
+        dataAsliSiswaCache = hasil.dataSiswa || hasil.data || []; 
+        
+        // 4. Konversi dan petakan database Log aktivitas ke dalam Object Cache berdasarkan NISN (r[1])
+        dataLogCache = {};
+        if (hasil.dataLog && hasil.dataLog.length > 1) {
+            for (let k = 1; k < hasil.dataLog.length; k++) {
+                let r = hasil.dataLog[k];
+                if (r && r[1]) { 
+                    // Memetakan NISN sebagai Key agar pencarian status siswa instan (O(1))
+                    dataLogCache[r[1].toString().trim()] = {
+                        waktu: r[0] || "-",
+                        // PERBAIKAN: Jika di sheet kosong, biarkan string kosong "". Jangan dipaksa jadi "Belum Ujian".
+                        status: r[4] ? r[4].toString().trim() : "", 
+                        kecurangan: r[5] !== undefined && r[5] !== "" ? parseInt(r[5]) : 0, // Kolom F (Kecurangan)  
+                        gps: r[6] || "-" // Kolom G (GPS)         
+                    };
+                }
+            }
+        }
+        // 5. Muat daftar paket koordinat GPS jika dropdown opsi masih kosong
+        if (document.getElementById("select-paket-gps").options.length <= 1) {
+            muatDaftarMenuPaketGps(hasil.daftarPaketUjian || []);
+        }
+
+        // 6. Perbarui komponen antarmuka filter kelas dan jalankan fungsi render tabel
+        updateDaftarOpsiFilterKelas(dataAsliSiswaCache, filterDropdown);
+        jalankanFilterKelasSiswa();
+
+        // 7. Tampilkan status sukses pembaruan waktu real-time di dasbor
+        statusBox.innerHTML = `🟢 Sinkron (Pembaruan: ${new Date().toLocaleTimeString('id-ID')})`;
+        statusBox.style.background = "#f0fdf4"; 
+        statusBox.style.color = "#166534";
+        statusBox.style.borderColor = "#bbf7d0";
+
+    } catch (error) {
+        // 8. Manajemen penanganan eror jika koneksi terputus atau respon json gagal diparsing
+        statusBox.innerHTML = `❌ Putus Hubungan: ${error.message}`;
+        statusBox.style.background = "#fef2f2"; 
+        statusBox.style.color = "#991b1b";
+        statusBox.style.borderColor = "#fecaca";
+    }
+}
+    // 2. FUNGSI DROPDOWN MENU PAKET GPS GURU
+    function muatDaftarMenuPaketGps(paketArr) {
+        const gpsSelect = document.getElementById("select-paket-gps");
+        if (!gpsSelect) return;
+
+        gpsSelect.innerHTML = '<option value="">-- Pilih Paket Asesmen Sumatif --</option>';
+        if (!paketArr || paketArr.length === 0) return;
+
+        paketArr.forEach((item, i) => {
+            let opt = document.createElement("option");
+            let nomorKolomSpreadsheet = 3 + i; 
+
+            opt.value = nomorKolomSpreadsheet; 
+            opt.innerText = item.judul; 
+            opt.setAttribute("data-iddoc", item.idDoc); 
+
+            gpsSelect.appendChild(opt);
+        });
+
+        console.log("Dropdown Sukses Terkunci secara Urutan Kolom (D, E, F, G dst.)");
+    }
+
+    // 3. FUNGSI DINAMIS UPDATE DAFTAR PILIHAN KELAS DI DROPDOWN FILTER
+    function updateDaftarOpsiFilterKelas(dataSiswa, dropdownElemen) {
+        if (!dataSiswa || dataSiswa.length <= 1) return;
+
+        let jumlahKelasAwal = daftarKelasDitemukan.size;
+
+        for (let i = 1; i < dataSiswa.length; i++) {
+            if (!dataSiswa[i]) continue;
+            const kelasSiswa = dataSiswa[i][2]; 
+
+            if (kelasSiswa !== undefined && kelasSiswa !== null && kelasSiswa !== "") {
+                daftarKelasDitemukan.add(kelasSiswa.toString().trim());
+            }
+        }
+
+        if (daftarKelasDitemukan.size > jumlahKelasAwal) {
+            const nilaiTerpilih = dropdownElemen.value;
+            dropdownElemen.innerHTML = '<option value="SEMUA">-- Tampilkan Semua Kelas --</option>';
+
+            Array.from(daftarKelasDitemukan).sort().forEach(namaKelas => {
+                let opt = document.createElement("option");
+                opt.value = namaKelas;
+                opt.innerText = "Kelas " + namaKelas;
+                dropdownElemen.appendChild(opt);
+            });
+            dropdownElemen.value = nilaiTerpilih;
+        }
+    }
+
+    // 4. FUNGSI INTI: RENDERING TABEL MONITORING (4 KOLOM PAS LAYAR HP)
+   function jalankanFilterKelasSiswa() {
+    const tbody = document.getElementById("monitor-table-body");
+    const filterDropdown = document.getElementById("filter-kelas-pengawas");
+    const selectGps = document.getElementById("select-paket-gps");
+    
+    if (!tbody || !filterDropdown) return; 
+    
+    const kelasTerpilih = filterDropdown.value;
+    tbody.innerHTML = ""; 
+
+    if (!dataAsliSiswaCache || dataAsliSiswaCache.length <= 1) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 25px;">Belum ada data di database.</td></tr>`;
+        return;
+    }
+
+    let totalBarisDitampilkan = 0;
+    let indeksKolomNilai = 3; 
+
+    if (selectGps && selectGps.value !== "") {
+        indeksKolomNilai = parseInt(selectGps.value); 
+    }
+    
+    // Loop membaca seluruh baris data siswa ke bawah
+    for (let i = 1; i < dataAsliSiswaCache.length; i++) {
+        const siswa = dataAsliSiswaCache[i];
+        if (!siswa || siswa.length < 2) continue;
+
+        // Ambil NISN dan bersihkan ruang spasi agar pencocokan indeks cache sempurna
+        const nisnSiswa  = siswa[0] ? siswa[0].toString().trim() : "-"; 
+        const namaSiswa  = siswa[1] || "-"; 
+        const kelasSiswa = (siswa[2] || "-").toString().trim(); 
+
+        // Menyinkronkan teks komparasi string filter kelas
+        if (kelasTerpilih !== "SEMUA" && kelasSiswa !== kelasTerpilih) {
+            continue; 
+        }
+
+        totalBarisDitampilkan++;
+        
+        let nilaiAkhir = "-";
+        if (siswa[indeksKolomNilai] !== undefined && siswa[indeksKolomNilai] !== "") {
+            nilaiAkhir = siswa[indeksKolomNilai];
+        }
+
+        // AMBIL LOG SISWA REAL-TIME (Dilengkapi pengaman objek kosong agar tidak crash)
+        let logSiswa = dataLogCache[nisnSiswa] || { status: "Belum Ujian", kecurangan: 0, gps: "-" };
+
+        let rawGps = logSiswa.gps ? logSiswa.gps.toString().trim() : "-";
+        let gpsText = "📍 GPS: -";
+        if (rawGps !== "" && rawGps !== "-") {
+            if (rawGps.toLowerCase().includes("aman") || rawGps.toLowerCase().includes("meter")) {
+                gpsText = `📍 GPS: ${rawGps.split(' ')[0]}m`;
+            } else if (rawGps.toLowerCase().includes("luar") || rawGps.toLowerCase().includes("jauh")) {
+                gpsText = `🔴 Luar`;
+            } else {
+                gpsText = `📍 GPS: ${rawGps}`; // Fallback jika teks lokasi berupa koordinat
+            }
+        }
+
+        // Hitung Angka Pelanggaran Crg
+        let totalPindahTab = parseInt(logSiswa.kecurangan) || 0;
+        let logCheatingHTML = `<span class="cheat-badge" style="background:#f1f5f9; color:#475569; padding: 4px 8px; border-radius: 4px;">${totalPindahTab}x</span>`;
+        if (totalPindahTab >= 3) {
+            logCheatingHTML = `<span class="cheat-badge" style="background:#fee2e2; color:#ef4444; font-weight:800; padding: 4px 8px; border-radius: 4px; animation: neonPulse 1s ease-in-out infinite alternate;">🚨 ${totalPindahTab}x</span>`;
+        }
+
+        // PENENTUAN LENCANA STATUS BERDASARKAN HASIL LOG SINKRON
+    // PENENTUAN LENCANA STATUS BERDASARKAN HASIL LOG SINKRON (VERSI AKURAT)
+        let badgeHTML = "";
+        let subTeksInfo = "";
+        let rawStatus = logSiswa.status ? logSiswa.status.toString().toLowerCase().trim() : "";
+
+        if (nilaiAkhir !== "-") {
+            // 1. Jika nilai sudah masuk di spreadsheet induk
+            badgeHTML = `<span class="status-badge" style="background:#dcfce7; color:#166534; padding: 4px 8px; border-radius: 4px; font-weight: 600;">🟢 Selesai</span>`;
+            subTeksInfo = "Nilai Terarsip";
+        } else if (rawStatus === "sedang ujian" || rawStatus === "sedang kerja") {
+            // 2. HANYA berubah biru jika di kolom E sheet Log benar-benar tertulis "Sedang Ujian"
+            badgeHTML = `<span class="status-badge" style="background:#eff6ff; color:#1d4ed8; padding: 4px 8px; border-radius: 4px; font-weight: 600;">🔄 Sedang Ujian</span>`;
+            subTeksInfo = gpsText;
+        } else {
+            // 3. Jika kolom status kosong (""), strip ("-"), atau selain di atas, maka default Belum Ujian
+            badgeHTML = `<span class="status-badge" style="background:#94a3b8; color:white; padding: 4px 8px; border-radius: 4px;">Belum Ujian</span>`;
+            subTeksInfo = "Belum kirim jawaban";
+        }
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>
+                <div class="td-name-block" style="font-size:12px; text-transform: uppercase; font-weight: 600; color: #1e293b;">${namaSiswa}</div>
+                <div class="td-sub-info" style="font-size:11px; color: #64748b; margin-top: 2px;">NISN: ${nisnSiswa} | Kls: ${kelasSiswa}</div>
+            </td>
+            <td style="text-align: center; vertical-align: middle;">
+                <div>${badgeHTML}</div>
+                <div class="td-sub-info" style="font-size:10px; margin-top:6px; color: #64748b;">${subTeksInfo}</div>
+            </td>
+            <td style="text-align: center; vertical-align: middle;">
+                <span class="score-text" style="font-size:14px; font-weight: 700; color: ${nilaiAkhir !== '-' ? '#10b981' : '#0f172a'}">${nilaiAkhir}</span>
+            </td>
+            <td style="text-align: center; vertical-align: middle;">
+                ${logCheatingHTML}
+            </td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    if (totalBarisDitampilkan === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 25px;">Tidak ada data siswa untuk kelas ini.</td></tr>`;
+    }
+}    
+    // 5. FUNGSI KUNCI TITIK KOORDINAT GPS RUANGAN GURU
+    function kunciLokasiRuanganGuru() {
+        const selectGps = document.getElementById("select-paket-gps");
+        const btnGps = document.getElementById("btn-kunci-lokasi");
+
+        if (!selectGps || selectGps.selectedIndex <= 0) {
+            return alert("Mohon pilih paket asesmen sumatif yang ingin diatur lokasinya terlebih dahulu!");
+        }
+
+        const selectedOption = selectGps.options[selectGps.selectedIndex];
+        const idDocTerpilih = selectedOption.getAttribute("data-iddoc");
+
+        if (!idDocTerpilih) {
+            return alert("Gagal mengambil ID Dokumen soal. Silakan muat ulang halaman.");
+        }
+        
+        if (!navigator.geolocation) return alert("Browser HP Anda tidak mendukung penguncian titik koordinat GPS.");
+        if (!confirm("Apakah Anda ingin merekam lokasi koordinat Anda saat ini sebagai batas radius resmi ruang ujian?")) return;
+
+        btnGps.innerText = "Mengunci Koordinat Kelas...";
+        btnGps.disabled = true;
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const latGuru = position.coords.latitude;
+                const lonGuru = position.coords.longitude;
+                const stringKoordinat = latGuru + "," + lonGuru;
+
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "update_lokasi_guru", idDoc: idDocTerpilih, koordinat: stringKoordinat })
+                })
+                .then(res => res.json())
+                .then(res => {
+                    btnGps.innerText = "Kunci Koordinat Ruangan Ini";
+                    btnGps.disabled = false;
+                    if (res.status === "success") {
+                        alert(`Sukses! Koordinat Ruang Ujian Berhasil Diperbarui.\n\nTitik Koordinat: ${stringKoordinat}\nSiswa wajib berada dalam radius 70 meter dari titik ini.`);
+                        muatDataMonitor();
+                    } else {
+                        alert("Gagal memperbarui lokasi ke Google Sheets.");
+                    }
+                });
+            },
+            function(error) {
+                alert("Gagal melacak lokasi HP Anda. Pastikan fitur GPS di HP Anda sudah dinyalakan!");
+                btnGps.innerText = "Kunci Koordinat Ruangan Ini"; btnGps.disabled = false;
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
+
+    // 6. FUNGSI OTOMATISASI EKSPOR REKAP LAPORAN KE BERKAS PDF
+function eksporLaporanUjianKePDF() {
+    try {
+        const kelasTerpilih = document.getElementById("filter-kelas-pengawas").value;
+        const pdfTbody = document.getElementById("pdf-table-body");
+        if (!pdfTbody) return;
+        pdfTbody.innerHTML = "";
+
+        const selectGps = document.getElementById("select-paket-gps");
+        let namaMapelAktif = "Asesmen Sumatif";
+        if (selectGps && selectGps.selectedIndex > 0) {
+            namaMapelAktif = selectGps.options[selectGps.selectedIndex].text;
+        }
+
+        if(document.getElementById("pdf-meta-mapel")) document.getElementById("pdf-meta-mapel").innerText = namaMapelAktif;
+        if(document.getElementById("pdf-meta-kelas")) document.getElementById("pdf-meta-kelas").innerText = kelasTerpilih === "SEMUA" ? "Semua Kelas" : "Kelas " + kelasTerpilih;
+        if(document.getElementById("pdf-meta-waktu")) document.getElementById("pdf-meta-waktu").innerText = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+
+        const elemenInputPengawas = document.getElementById("input-nama-pengawas");
+        let namaPengawasSekarang = elemenInputPengawas ? elemenInputPengawas.value.trim() : "Pengawas Ruang Ujian";
+        if(namaPengawasSekarang === "") namaPengawasSekarang = "Pengawas Ruang Ujian";
+
+        if(document.getElementById("pdf-meta-pengawas")) {
+            document.getElementById("pdf-meta-pengawas").innerText = namaPengawasSekarang;
+        }
+
+        const barisHeader = dataAsliSiswaCache[0];
+        let indeksKolomNilai = 3;
+        if (selectGps && selectGps.selectedIndex > 0) {
+            indeksKolomNilai = parseInt(selectGps.value);
+        }
+
+        let nomorUrutPdf = 1;
+        if (typeof dataAsliSiswaCache !== 'undefined' && dataAsliSiswaCache.length > 0) {
+            for (let i = 1; i < dataAsliSiswaCache.length; i++) {
+                const kolom = dataAsliSiswaCache[i];
+                if (!kolom) continue;
+
+                const idSiswa = kolom[0] || "-";
+                const namaSiswa = kolom[1] || "-";
+                const kelasSiswa = (kolom[2] || "-").toString().trim();
+                
+                let nilaiAkhir = "-";
+                if (kolom[indeksKolomNilai] !== undefined && kolom[indeksKolomNilai] !== "") {
+                    nilaiAkhir = kolom[indeksKolomNilai];
+                }
+
+                if (kelasTerpilih !== "SEMUA" && kelasSiswa !== kelasTerpilih) continue;
+
+                let logSiswa = dataLogCache[idSiswa.toString().trim()] || { status: "", kecurangan: 0, gps: "" };
+
+                // ==================== 🛠️ PERBAIKAN: LOGIKA STATUS UJIAN ====================
+                let rawStatus = logSiswa.status ? logSiswa.status.toString().toLowerCase().trim() : "";
+                let statusTeksPdf = "Belum Ujian";
+
+                if (nilaiAkhir !== "-") {
+                    statusTeksPdf = "Selesai";
+                } else if (rawStatus === "sedang ujian" || rawStatus === "sedang kerja" || rawStatus === "online") {
+                    statusTeksPdf = "Sedang Ujian";
+                } else {
+                    statusTeksPdf = "Belum Ujian";
+                }
+                // ===========================================================================
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td style="text-align: center; padding: 6px; border: 1px solid #cbd5e1; word-wrap: break-word;">${nomorUrutPdf}</td>
+                    <td style="text-align: center; padding: 6px; border: 1px solid #cbd5e1; word-wrap: break-word;">${idSiswa}</td>
+                    <td style="font-weight: 600; padding: 6px; border: 1px solid #cbd5e1; text-align: left; text-transform: uppercase; word-wrap: break-word;">${namaSiswa}</td>
+                    <td style="text-align: center; padding: 6px; border: 1px solid #cbd5e1; word-wrap: break-word;">${kelasSiswa}</td>
+                    
+                    <!-- KOLOM 5: STATUS UJIAN -->
+                    <td style="text-align: center; padding: 6px; border: 1px solid #cbd5e1; font-weight: bold; color: ${statusTeksPdf === 'Selesai' ? '#16a34a' : (statusTeksPdf === 'Sedang Ujian' ? '#ea580c' : '#64748b')}; word-wrap: break-word;">${statusTeksPdf}</td>
+                    
+                    <!-- KOLOM 6: KECURANGAN -->
+                    <td style="text-align: center; padding: 6px; border: 1px solid #cbd5e1; word-wrap: break-word;">${logSiswa.kecurangan || 0}x</td>
+                    
+                    <!-- KOLOM 7: SKOR AKHIR -->
+                    <td style="text-align: center; font-weight: 700; padding: 6px; border: 1px solid #cbd5e1; word-wrap: break-word;">${nilaiAkhir}</td>
+                `;
+                if (pdfTbody) pdfTbody.appendChild(tr);
+                nomorUrutPdf++;
+            }
+        }
+
+        const elemenCetak = document.getElementById("pdf-export-area");
+        if (!elemenCetak) return;
+
+        elemenCetak.style.display = "block"; 
+
+        setTimeout(function() {
+            const opsiCetak = {
+            margin: 15, 
+            filename: `Laporan_Sumatif_Kelas_${kelasTerpilih}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true,
+                logging: false,
+                scrollY: 0, // Mengunci scrollbar HP saat pengambilan gambar tabel
+                scrollX: 0
+            },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            // TAMBAHKAN KODE DI BAWAH INI:
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } 
+            };
+
+            
+            if (typeof html2pdf === 'function') {
+                html2pdf().set(opsiCetak).from(elemenCetak).save().then(() => {
+                    elemenCetak.style.display = "none"; 
+                });
+            } else {
+                alert("Library html2pdf.js belum termuat sempurna.");
+                elemenCetak.style.display = "none";
+            }
+        }, 500);
+
+    } catch (e) {
+        console.error("Eror pada fungsi PDF:", e);
+    }
+}
+    
+    // ==========================================
+    muatDataMonitor();
+    setInterval(muatDataMonitor, 4000);
+
+    const selectGpsUjian = document.getElementById("select-paket-gps");
+    if (selectGpsUjian) {
+        selectGpsUjian.addEventListener("change", function() {
+            console.log("Paket ujian diganti ke: " + this.options[this.selectedIndex].text);
+            jalankanFilterKelasSiswa(); 
+        });
+    }
+</script>
+</body>
+</html>

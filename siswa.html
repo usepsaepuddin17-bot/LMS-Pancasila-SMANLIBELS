@@ -3,557 +3,557 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Latihan Soal CBT - LMS Pendidikan Pancasila</title>
-    <link href="https://googleapis.com" rel="stylesheet">
-    
+    <title>CBT Asesmen Sumatif</title>
     <style>
-        * {margin: 0;padding: 0;box-sizing: border-box;font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-         body {background-color: #f4f6f9;padding: 10px;display: flex;justify-content: center; align-items: flex-start; min-height: 100vh; }
-        .lms-container { background-color: #ffffff; width: 100%; max-width: 480px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); overflow: hidden; border: 3px solid #1a5f7a;  margin-top: 10px; }
-        .lms-header { background: linear-gradient(135deg, #1a5f7a 0%, #103f52 100%); color: white;  text-align: center; padding: 25px 15px; }
-        .garuda-logo { width: 75px; height: auto; margin-bottom: 12px; }
+        /* 1. Pengaturan Dasar Halaman */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #f4f6f9; padding: 10px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+        
+        /* 2. Wadah Utama Aplikasi (Ukuran HP) */
+        .lms-container { background-color: #ffffff; width: 100%; max-width: 480px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); overflow: hidden; border: 3px solid #1a5f7a; margin-top: 10px; }
+        
+        /* 3. Banner Atas Halaman */
+        .lms-header { background: linear-gradient(135deg, #1a5f7a 0%, #103f52 100%); color: white; text-align: center; padding: 25px 15px; position: relative; }
         .lms-header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
         .badge-page { background-color: #3182ce; color: white; padding: 6px 16px; border-radius: 30px; font-size: 12px; font-weight: 600; display: inline-block; margin-bottom: 10px; }
+        
+        /* 4. Wadah Jam Digital Hitung Mundur */
+        .timer-box { background-color: #f45050; color: white; padding: 8px 15px; border-radius: 10px; font-size: 14px; font-weight: 700; margin-top: 10px; display: none; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.85; } 100% { opacity: 1; } }
+
+        /* 5. Pengaturan Sembunyikan/Munculkan Konten */
         .page-section { display: none; padding: 20px 15px; background-color: #ffffff; }
-        .page-active { display: flex;  flex-direction: column; }
+        .page-active { display: flex; flex-direction: column; }
+        
+        /* 6. Desain Formulir Identitas */
         .form-title { font-size: 16px; font-weight: 700; color: #1a5f7a; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; }
-        .form-group { margin-bottom: 15px; display: flex;  flex-direction: column; gap: 5px; }
-        .form-group label {font-size: 13px; font-weight: 600; color: #475569; }
+        .form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 13px; font-weight: 600; color: #475569; }
         .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 14px; color: #334155; outline: none; }
         .form-group input:focus, .form-group select:focus { border-color: #1a5f7a; }
-        /* Group khusus untuk NISN + Tombol Cek mendatar */
+        
+        /* 7. Baris NISN mendatar berjejer dengan Tombol */
         .input-btn-group { display: flex; gap: 8px; }
         .input-btn-group input { flex: 1; }
-           .btn-cek { background-color: #f45050; color: white; border: none; padding: 0 15px;  border-radius: 8px; font-weight: 600; font-size: 13px;  cursor: pointer;  }
-        .loading-text {
-            font-size: 11px;
-            color: #64748b;
-            font-style: italic;
-            margin-top: 2px;
-        }
-
-        /* SOAL CBT STYLES */
-        .soal-card {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .soal-teks {
-            font-size: 14px;
-            color: #1e293b;
-            font-weight: 600;
-            margin-bottom: 12px;
-            line-height: 1.5;
-        }
-
-        .pilihan-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .pilihan-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: white;
-            border: 2px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 10px 12px;
-            cursor: pointer;
-            font-size: 13px;
-            color: #334155;
-            transition: all 0.2s;
-        }
-
-        .btn-container {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-        }
-
-        .btn-back { background-color: #e2e8f0; color: #475569; }
+        .btn-cek { background-color: #f45050; color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; }
+        .loading-text { font-size: 11px; color: #64748b; font-style: italic; margin-top: 2px; }
+        
+        /* 8. Desain Kotak Kartu Soal */
+        .soal-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+        .soal-teks { font-size: 14px; color: #1e293b; font-weight: 600; margin-bottom: 12px; line-height: 1.5; }
+        .pilihan-container { display: flex; flex-direction: column; gap: 10px; }
+        .pilihan-item { display: flex; align-items: center; gap: 10px; background: white; border: 2px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; cursor: pointer; font-size: 13px; color: #334155; transition: all 0.2s; }
+        
+        /* 9. Tombol Navigasi Bawah */
+        .btn-container { display: flex; gap: 10px; margin-top: 10px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; }
         .btn-submit { background-color: #1a5f7a; color: white; }
     </style>
 </head>
 <body>
-    <div class="lms-container">
-        <!-- BANNER ATAS PERMANEN -->
-        <div class="lms-header">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Garuda_Pancasila%2C_Coat_of_Arms_of_Indonesia.svg" alt="Garuda Pancasila" class="garuda-logo">
-            <h1>LMS PENDIDIKAN PANCASILA</h1>
-            <div class="badge-page">Menu: Latihan Soal (CBT)</div>
+<div class="lms-container">
+    <!-- A. Banner Judul Aplikasi -->
+    <div class="lms-header">
+        <div style="font-size: 13px; font-weight: 600; letter-spacing: 1px; color: #cbd5e1; margin-bottom: 2px;">SMA NEGERI 15 MALUKU TENGAH</div>
+        <h1 style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">PENDIDIKAN PANCASILA</h1>
+        <div class="badge-page">Asesmen Sumatif</div>
+        <!-- Kotak Sisa Waktu (Hitung Mundur) -->
+        <div id="countdown-timer" class="timer-box">Sisa Waktu: --:--</div>
+    </div>
+
+    <!-- B. PANEL 1: FORMULIR IDENTITAS SISWA -->
+    <div id="section-identitas" class="page-section page-active">
+        <div class="form-title">Identitas Peserta Didik</div>
+        
+        <!-- Input NISN & Tombol Cek -->
+        <div class="form-group">
+            <label for="nisn"> ID Siswa</label>
+            <div class="input-btn-group">
+                <input type="number" id="nisn" placeholder="Masukkan ID Siswa...">
+                <button class="btn-cek" id="btn-periksa" onclick="verifikasiIdSiswa()">Cek ID</button>
+            </div>
+            <span id="siswa-status" class="loading-text">Silakan masukkan ID lalu klik Cek ID</span>
         </div>
 
-        <!-- SUB-HALAMAN A: FORMULIR IDENTITAS SISWA -->
-        <div id="section-identitas" class="page-section page-active">
-            <div class="form-title">Identitas Peserta Didik</div>
-            
-            <div class="form-group">
-                <label for="nisn">NISN / ID Siswa</label>
-                <div class="input-btn-group">
-                    <input type="number" id="nisn" placeholder="Masukkan ID Siswa...">
-                    <button class="btn-cek" id="btn-periksa" onclick="verifikasiIdSiswa()">Cek ID</button>
-                </div>
-                <span id="siswa-status" class="loading-text" style="color: #cbd5e1;">Silakan masukkan ID lalu klik Cek ID</span>
-            </div>
-
-            <div class="form-group">
-                <label for="nama">Nama Lengkap</label>
-                <input type="text" id="nama" placeholder="Akan terisi otomatis..." readonly style="background-color: #f1f5f9;">
-            </div>
-
-            <div class="form-group">
-                <label for="kelas">Kelas</label>
-                <input type="text" id="kelas" placeholder="Akan terisi otomatis..." readonly style="background-color: #f1f5f9;">
-            </div>
-
-            <div class="form-group">
-                <label for="pertemuan">Pilih Pertemuan Berdasarkan Judul</label>
-                <select id="pertemuan" disabled>
-                    <option value="">-- Kunci ID Terlebih Dahulu --</option>
-                </select>
-                <span id="loading-status" class="loading-text">Menunggu verifikasi identitas siswa...</span>
-            </div>
-
-            <div class="btn-container">
-                <a href="index.html" class="btn btn-back">Kembali ke Beranda</a>
-                <button class="btn btn-submit" id="btn-lanjut" onclick="ambilSoalDariDoc()" disabled>Mulai Ujian</button>
-            </div>
+        <!-- Input Nama Lengkap (Readonly / Tidak Bisa Diedit) -->
+        <div class="form-group">
+            <label for="nama">Nama Lengkap</label>
+            <input type="text" id="nama" placeholder="Akan terisi otomatis..." readonly style="background-color: #f1f5f9;">
         </div>
 
-        <!-- SUB-HALAMAN B: LEMBAR SOAL UJIAN CBT -->
-        <div id="section-ujian" class="page-section">
-            <div class="form-title" id="judul-ujian">Lembar Kerja Ujian</div>
-            <div id="box-soal-cbt"></div>
-            <div class="btn-container">
-                <button class="btn btn-submit" id="btn-selesai" onclick="hitungDanKirimNilai()">Selesai & Kirim Nilai</button>
-            </div>
+        <!-- Input Kelas (Readonly / Tidak Bisa Diedit) -->
+        <div class="form-group">
+            <label for="kelas">Kelas</label>
+            <input type="text" id="kelas" placeholder="Akan terisi otomatis..." readonly style="background-color: #f1f5f9;">
+        </div>
+
+        <!-- Dropdown Paket Ujian Sumatif -->
+        <div class="form-group">
+            <label for="pertemuan">Pilih Paket Asesmen</label>
+            <select id="pertemuan" disabled>
+                <option value="">-- Kunci ID Terlebih Dahulu --</option>
+            </select>
+            <span id="loading-status" class="loading-text">Menunggu verifikasi identitas...</span>
+        </div>
+
+        <!-- Input Kata Kunci / Token Token Ujian Dinamis -->
+        <div class="form-group" id="group-token" style="display: none;">
+            <label for="token-ujian">Masukkan Kata Kunci / Token</label>
+            <input type="text" id="token-ujian" placeholder="Ketik token dari guru...">
+        </div>
+
+        <!-- Tombol Aktivasi Mulai -->
+        <div class="btn-container">
+            <button class="btn btn-submit" id="btn-lanjut" onclick="validasiSebelumMulai()" disabled>Mulai Ujian</button>
         </div>
     </div>
+
+    <!-- C. PANEL 2: LEMBAR UTAMA SOAL CBT -->
+    <div id="section-ujian" class="page-section">
+        <div class="form-title" id="judul-ujian">Lembar Kerja Ujian</div>
+        
+        <!-- Wadah Kosong Tempat Soal Disuntikkan oleh JavaScript -->
+        <div id="box-soal-cbt"></div>
+        
+        <!-- Tombol Submit Selesai -->
+        <div class="btn-container">
+            <button class="btn btn-submit" id="btn-selesai" onclick="hitungDanKirimNilai()">Selesai & Kirim Nilai</button>
+        </div>
+    </div>
+</div>
 <script>
-// URL Web App Apps Script resmi Anda
+// PENTING: TEMPELKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI NANTI
 const API_URL = "https://script.google.com/macros/s/AKfycbyrrF-fNhUYcKUetVoalOT-Unrd2s8WuXVu_PCaagicTyiJgewnvgN1lgm7ty7zU0fNag/exec";
+
+// Variabel Global Penampung Data
 let infoSiswa = {};
 let kunciJawabanAsli = []; 
 let statusSiswaValid = false;
+let jumlahPelanggaran = 0; 
+let sedangUjian = false;   
+let timerInterval; 
+let tokenKunciDinamis = ""; // Menyimpan token asli dari baris spreadsheet yang dipilih
 
-// ==========================================
-// FUNGSI 1: VERIFIKASI ID SISWA (CEK ID)
-// ==========================================
+// 1. FUNGSI VERIFIKASI ID SISWA (NISN)
 function verifikasiIdSiswa() {
-  const inputId = document.getElementById('nisn').value.trim();
-  const txtSiswaStatus = document.getElementById('siswa-status');
-  const txtNama = document.getElementById('nama');
-  const txtKelas = document.getElementById('kelas');
-  const btnPeriksa = document.getElementById('btn-periksa');
+    const inputId = document.getElementById('nisn').value.trim();
+    const txtSiswaStatus = document.getElementById('siswa-status');
+    const txtNama = document.getElementById('nama');
+    const txtKelas = document.getElementById('kelas');
+    const btnPeriksa = document.getElementById('btn-periksa');
 
-  if (!inputId) {
-    alert("Mohon ketik NISN / ID Siswa terlebih dahulu!");
-    return;
-  }
-
-  btnPeriksa.innerText = "Memeriksa...";
-  btnPeriksa.disabled = true;
-  txtSiswaStatus.innerText = "Mencari di data absen...";
-  txtSiswaStatus.style.color = "#3182ce";
-
-  fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({ action: "cekSiswa", idSiswa: inputId })
-  })
-  .then(response => response.json())
-  .then(res => {
-    btnPeriksa.innerText = "Cek ID";
-    btnPeriksa.disabled = false;
+    if (!inputId) return alert("Mohon ketik NISN / ID Siswa terlebih dahulu!");
     
-    if (res.status === "success" && res.found) {
-      txtNama.value = res.nama;
-      txtKelas.value = res.kelas;
-      txtSiswaStatus.innerText = "Siswa Terdaftar! Identitas berhasil dikunci.";
-      txtSiswaStatus.style.color = "#22c55e";
-      statusSiswaValid = true;
-      ambilDaftarPertemuan();
-    } else {
-      txtNama.value = "";
-      txtKelas.value = "";
-      txtSiswaStatus.innerText = "ID Siswa tidak terdaftar di database absen!";
-      txtSiswaStatus.style.color = "#f45050";
-      statusSiswaValid = false;
-      document.getElementById('pertemuan').disabled = true;
-      document.getElementById('pertemuan').innerHTML = '<option value="">-- Kunci ID Terlebih Dahulu --</option>';
-      document.getElementById('btn-lanjut').disabled = true;
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    btnPeriksa.innerText = "Cek ID";
-    btnPeriksa.disabled = false;
-    txtSiswaStatus.innerText = "Gagal memproses data. Cek koneksi internet.";
-    txtSiswaStatus.style.color = "#f45050";
-  });
-}
-
-
-// ==========================================
-// FUNGSI 2: AMBIL DAFTAR PERTEMUAN BANK SOAL
-// ==========================================
-function ambilDaftarPertemuan() {
-  const selectPertemuan = document.getElementById('pertemuan');
-  const statusText = document.getElementById('loading-status');
-  const btnLanjut = document.getElementById('btn-lanjut');
-
-  statusText.innerText = "Menghubungkan ke database bank soal...";
-  statusText.style.color = "#3182ce";
-
-  // Memanggil getDaftarMenu lewat POST sesuai route doPost di Kode.gs Anda
-  fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({ action: "getDaftarMenu" })
-  })
-  .then(response => response.json())
-  .then(res => {
-    if (res.status === "success") {
-      const filtered = res.data.filter(item => item.tipe === "Latihan Soal");
-      selectPertemuan.innerHTML = '<option value="">-- Pilih Pertemuan --</option>';
-      
-      filtered.forEach(item => {
-        let opt = document.createElement('option');
-        opt.value = item.idDoc; 
-        opt.setAttribute('data-kolom', "Nilai_Latihan_" + item.pertemuan);
-        opt.innerText = "Pertemuan " + item.pertemuan + " - " + item.judul;
-        selectPertemuan.appendChild(opt);
-      });
-
-      selectPertemuan.disabled = false;
-      btnLanjut.disabled = false;
-      statusText.innerText = "Silakan pilih pertemuan ujian.";
-      statusText.style.color = "#22c55e";
-    } else {
-      statusText.innerText = "Gagal memuat bank pertemuan.";
-      statusText.style.color = "#f45050";
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    statusText.innerText = "Koneksi bank soal terputus.";
-    statusText.style.color = "#f45050";
-  });
-}
-
-// ==========================================
-// FUNGSI 3: AMBIL ISI TEKS SOAL DARI GOOGLE DOC
-// ==========================================
-function ambilSoalDariDoc() {
-  const selectPertemuan = document.getElementById('pertemuan');
-  const idDoc = selectPertemuan.value ? selectPertemuan.value.trim() : "";
-
-  if (!statusSiswaValid) {
-    alert('ID Siswa belum terverifikasi!');
-    return;
-  }
-  if (!idDoc) {
-    alert('Mohon pilih pertemuan terlebih dahulu!');
-    return;
-  }
-
-  infoSiswa = {
-    idSiswa: document.getElementById('nisn').value.trim(),
-    nama: document.getElementById('nama').value,
-    kelas: document.getElementById('kelas').value,
-    kolomLatihan: selectPertemuan.options[selectPertemuan.selectedIndex].getAttribute('data-kolom')
-  };
-
-  document.getElementById('btn-lanjut').innerText = "Memuat Soal...";
-  document.getElementById('btn-lanjut').disabled = true;
-
-  fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({ action: "getDocContent", idDoc: idDoc })
-  })
-  .then(response => response.json())
-  .then(res => {
-    if (res.status === "success") {
-      parseTeksMenjadiSoal(res.content);
-      document.getElementById('section-identitas').classList.remove('page-active');
-      document.getElementById('section-ujian').classList.add('page-active');
-      mulaiUjian(); // Memicu logging pelacakan aktivitas siswa
-    } else {
-      console.error("Gagal dari API:", res.message);
-      alert("Gagal memuat dokumen soal: " + (res.message || "Pastikan ID Dokumen benar."));
-      document.getElementById('btn-lanjut').innerText = "Mulai Ujian";
-      document.getElementById('btn-lanjut').disabled = false;
-    }
-  })
-  .catch(err => {
-    console.error("Koneksi Error:", err);
-    alert("Terjadi kesalahan koneksi internet atau script Google Anda belum di-deploy dengan benar.");
-    document.getElementById('btn-lanjut').innerText = "Mulai Ujian";
-    document.getElementById('btn-lanjut').disabled = false;
-  });
-}
-
-// ==========================================
-// FUNGSI 4: PARSING TEKS MENJADI TAMPILAN CBT
-// ==========================================
-function parseTeksMenjadiSoal(teksPenuh) {
-  const containerBox = document.getElementById('box-soal-cbt');
-  containerBox.innerHTML = ""; 
-  kunciJawabanAsli = [];
-
-  const islands = teksPenuh.split(/\[Soal\s*\d+\]/i);
-  let nomorUrut = 1;
-
-  for (let i = 1; i < islands.length; i++) {
-    let teksBlok = islands[i].trim();
-    if (!teksBlok) continue;
-
-    let barisKunci = teksBlok.match(/Kunci[\s\xA0]*:[\s\xA0]*(.*)/i);
-    let kunciBersih = "";
-    if (barisKunci && barisKunci[1]) {
-      kunciBersih = barisKunci[1].trim();
-    }
-
-    kunciJawabanAsli.push(kunciBersih);
-    let barisBarisRaw = teksBlok.split("\n").map(b => b.trim()).filter(b => b !== "");
-    let kalimatPertanyaanArr = [];
-    let daftarOpsi = [];
-
-    for (let j = 0; j < barisBarisRaw.length; j++) {
-      let barisAktif = barisBarisRaw[j];
-      if (/^Kunci/i.test(barisAktif) || barisAktif.toUpperCase().includes("KUNCI")) {
-        continue; 
-      }
-
-      let opsiMatch = barisAktif.match(/^([A-E])\s*[\)[\]|\.]\s*(.*)/i);
-      if (opsiMatch) {
-        daftarOpsi.push({ 
-          huruf: opsiMatch[1].toUpperCase(), 
-          teksOpsi: opsiMatch[2] 
-        });
-      } else {
-        kalimatPertanyaanArr.push(barisAktif);
-      }
-    }
-
-    let kalimatPertanyaan = kalimatPertanyaanArr.join("<br>");
-    kalimatPertanyaan = kalimatPertanyaan.replace(/\[GAMBAR:\s*(https?:\/\/[^\s\]]+)\s*\]/gi, function(match, urlGbr) {
-      return `<br><img src="${urlGbr}" style="max-width:100%; height:auto; display:block; margin:10px 0; border-radius:8px;">`;
-    }); 
-
-    let htmlSoal = `<div class="soal-card"><div class="soal-teks" data-indeks="${nomorUrut - 1}">${nomorUrut}. ${kalimatPertanyaan}</div><div class="pilihan-container">`;
-
-    if (daftarOpsi.length === 0) {
-      htmlSoal += `
-        <textarea name="soal_${nomorUrut}" data-tipe="essay" class="input-uraian" rows="4" 
-        style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-family:inherit; resize:vertical;" placeholder="Ketik jawaban uraian Anda di sini..."></textarea>
-      `;
-    } else {
-      daftarOpsi.forEach(opsi => {
-        htmlSoal += `
-          <label class="pilihan-item">
-            <input type="radio" name="soal_${nomorUrut}" data-tipe="pg" value="${opsi.huruf}">
-            <span>${opsi.huruf}. ${opsi.teksOpsi}</span>
-          </label>
-        `;
-      });
-    }
-
-    htmlSoal += `</div></div>`;
-    containerBox.innerHTML += htmlSoal;
-    nomorUrut++;
-  }
-}
-
-// ==========================================
-// FUNGSI 5: HITUNG SKOR & KIRIM HASIL KE AI
-// ==========================================
-function hitungDanKirimNilai() {
-  let benarPG = 0;
-  let totalPG = 0;
-  let dataSoalUraian = [];
-  let totalSoal = kunciJawabanAsli.length;
-
-  for (let i = 0; i < totalSoal; i++) {
-    let nomorSoal = i + 1;
-    let elemenRadioChecked = document.querySelector(`input[name="soal_${nomorSoal}"]:checked`);
-    let elemenUraian = document.querySelector(`textarea[name="soal_${nomorSoal}"]`);
-    let apakahIniSoalPG = document.querySelector(`input[type="radio"][name="soal_${nomorSoal}"]`);
-
-    if (apakahIniSoalPG && !elemenRadioChecked) {
-      alert(`Waduh, soal nomor ${nomorSoal} (Pilihan Ganda) belum kamu isi nih!`);
-      return;
-    } 
-    if (elemenUraian && elemenUraian.value.trim() === "") {
-      alert(`Waduh, soal nomor ${nomorSoal} (Uraian) belum kamu isi nih!`);
-      elemenUraian.focus();
-      return;
-    }
-  }
-
-  for (let i = 0; i < totalSoal; i++) {
-    let nomorSoal = i + 1;
-    let elemenRadioChecked = document.querySelector(`input[name="soal_${nomorSoal}"]:checked`);
-    let elemenUraian = document.querySelector(`textarea[name="soal_${nomorSoal}"]`);
-
-    if (elemenRadioChecked) {
-      totalPG++;
-      let jawabanSiswa = elemenRadioChecked.value.trim().toUpperCase();
-      let kunciBenar = kunciJawabanAsli[i].trim().toUpperCase().replace(/[^A-E]/g, "");
-      if (jawabanSiswa === kunciBenar) {
-        benarPG++;
-      }
-    } else if (elemenUraian) {
-      let elemenCard = elemenUraian.closest('.soal-card');
-      let teksPertanyaan = "Soal Uraian " + nomorSoal;
-      if (elemenCard) {
-        let elemenTeksSoal = elemenCard.querySelector('.soal-teks');
-        if (elemenTeksSoal) {
-          teksPertanyaan = elemenTeksSoal.innerText.replace(/^\d+\.\s*/, ""); 
-        }
-      }
-      dataSoalUraian.push({
-        pertanyaan: teksPertanyaan,
-        kunciPanduan: kunciJawabanAsli[i],
-        jawabanSiswa: elemenUraian.value.trim()
-      });
-    }
-  }
-
-  let nilaiMurniPG = totalPG > 0 ? (benarPG / totalPG) * 100 : 0;
-
-  if (confirm("Apakah Anda yakin ingin menyelesaikan ujian? AI akan memeriksa jawaban essay Anda secara otomatis.")) {
-    const btnSelesai = document.getElementById('btn-selesai');
-    if (btnSelesai) { btnSelesai.style.display = 'none'; }
-
-    document.getElementById('box-soal-cbt').innerHTML = `
-      <div style='text-align:center; padding:40px;'>
-        <p style='font-size: 18px; font-weight: bold;'>AI sedang memeriksa jawaban Essay Anda...</p>
-        <p style='color: #666; margin-top: 5px;'>Mohon tunggu sebentar, jangan menutup halaman ini.</p>
-      </div>`;
-
-    const dataPaket = {
-      action: "prosesNilaiDanEssayAI", 
-      idSiswa: document.getElementById('nisn').value.trim(),
-      kolomLatihan: infoSiswa.kolomLatihan,
-      nilaiPG: nilaiMurniPG,
-      dataEssay: dataSoalUraian
-    };
+    btnPeriksa.innerText = "Memeriksa...";
+    btnPeriksa.disabled = true;
+    txtSiswaStatus.innerText = "Mencari di database...";
+    txtSiswaStatus.style.color = "#3182ce";
 
     fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify(dataPaket)
+        method: "POST",
+        body: JSON.stringify({ action: "cekSiswa", idSiswa: inputId })
     })
-    .then(response => {
-      if (!response.ok) { throw new Error("Koneksi ke Web App gagal."); }
-      return response.json();
-    })
+    .then(response => response.json())
     .then(res => {
-      if (res.status === "success") {
-        selesaiUjian(); // Mencatat status "Selesai" ke lembar log aktivitas
-        alert("Ujian selesai!\n\n" +
-              "Nilai PG: " + res.nilaiPG + "\n" +
-              "Nilai Essay (AI): " + res.nilaiEssay + "\n" +
-              "Nilai Akhir Gabungan: " + res.nilaiTotal + "\n\n" +
-              "Data berhasil disimpan ke Google Sheets.");
-        window.location.href = "index.html";
-      } else {
-        alert("Gagal memproses nilai: " + (res.message || "Terjadi kesalahan di server."));
-        document.getElementById('box-soal-cbt').innerHTML = `<p style='text-align:center; color:red;'>Gagal mengirim. Silakan muat ulang halaman atau hubungi pengajar.</p>`;
-        if (btnSelesai) { btnSelesai.style.display = 'block'; }
-      }
+        btnPeriksa.innerText = "Cek ID";
+        btnPeriksa.disabled = false;
+        if (res.status === "success" && res.found) {
+            txtNama.value = res.nama;
+            txtKelas.value = res.kelas;
+            txtSiswaStatus.innerText = "Siswa Terdaftar! Identitas dikunci.";
+            txtSiswaStatus.style.color = "#22c55e";
+            statusSiswaValid = true;
+            ambilDaftarPertemuan(); // Panggil daftar paket ujian
+        } else {
+            txtNama.value = ""; txtKelas.value = "";
+            txtSiswaStatus.innerText = "ID tidak ditemukan!";
+            txtSiswaStatus.style.color = "#f45050";
+            statusSiswaValid = false;
+            document.getElementById('pertemuan').disabled = true;
+            document.getElementById('btn-lanjut').disabled = true;
+        }
     })
     .catch(err => {
-      console.error("Error Network:", err);
-      alert("Gagal terhubung ke server ujian: " + err.message);
-      if (btnSelesai) { btnSelesai.style.display = 'block'; }
+        btnPeriksa.innerText = "Cek ID"; btnPeriksa.disabled = false;
+        txtSiswaStatus.innerText = "Koneksi gagal."; txtSiswaStatus.style.color = "#f45050";
     });
-  }
+}
+// 2. FUNGSI MEMUAT DAFTAR UJIAN SUMATIF DARI SPREADSHEET
+function ambilDaftarPertemuan() {
+    const selectPertemuan = document.getElementById('pertemuan');
+    const statusText = document.getElementById('loading-status');
+    const btnLanjut = document.getElementById('btn-lanjut');
+    statusText.innerText = "Menghubungkan ke bank soal...";
+    statusText.style.color = "#3182ce";
+
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "getDaftarMenu" })
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.status === "success") {
+            selectPertemuan.innerHTML = '<option value="">-- Pilih Paket Ujian --</option>';
+            res.data.forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.idDoc; 
+                
+                // MENGUNCI TARGET PENAMAAN KOLOM SESUAI KESEPAKATAN ASESMEN SUMATIF
+                opt.setAttribute('data-kolom', "Asesmen Sumatif " + item.pertemuan);
+                
+                // MENYIMPAN DATA DINAMIS PER BARIS KEDALAM ATRIBUT DROPDOWN
+                opt.setAttribute('data-durasi', item.waktu || 60); 
+                opt.setAttribute('data-token', item.kataKunci || ""); 
+                
+                opt.innerText = item.judul; // Muncul misal: "Ulangan Harian 1"
+                selectPertemuan.appendChild(opt);
+            });
+            selectPertemuan.disabled = false;
+            btnLanjut.disabled = false;
+            statusText.innerText = "Silakan pilih paket ujian.";
+            statusText.style.color = "#22c55e";
+
+            // Pasang event listener jika pilihan dropdown berubah
+            selectPertemuan.onchange = function() {
+                const selectedOpt = selectPertemuan.options[selectPertemuan.selectedIndex];
+                tokenKunciDinamis = selectedOpt.getAttribute('data-token') || "";
+                if(tokenKunciDinamis !== "") {
+                    document.getElementById('group-token').style.display = "block";
+                } else {
+                    document.getElementById('group-token').style.display = "none";
+                }
+            };
+        } else {
+            statusText.innerText = "Gagal memuat daftar ujian.";
+            statusText.style.color = "#f45050";
+        }
+    });
 }
 
-// =========================================================================
-// FUNGSI 6: AMBIL ABSENSI & PELACAKAN AKTIVITAS (SINKRON DENGAN doGet KODE.GS)
-// =========================================================================
-// =========================================================================
-// FUNGSI 6: AMBIL ABSENSI & PELACAKAN AKTIVITAS (100% DINAMIS BERDASARKAN INPUT)
-// =========================================================================
-// =========================================================================
-// FUNGSI 6: AMBIL ABSENSI & PELACAKAN AKTIVITAS (DENGAN KUAT JALUR KEEPALIVE)
-// =========================================================================
-async function kirimAbsenSiswa(idSiswa, namaSiswa, kelas) {
-  const url = `${API_URL}?action=siswaAbsen&idSiswa=${encodeURIComponent(idSiswa)}&namaSiswa=${encodeURIComponent(namaSiswa)}&kelas=${encodeURIComponent(kelas)}&status=Hadir`;
-  try {
-    const response = await fetch(url);
-    const res = await response.json();
-    if(res.status === "success") alert("Absen Anda hari ini berhasil tercatat!");
-  } catch (e) {
-    console.error("Gagal mengirim absensi:", e);
-  }
-}
+// 3. VALIDASI TOKEN SEBELUM AMBIL SOAL
+// 3. VALIDASI TOKEN DAN PEMBATASAN SATU KALI UJIAN SEBELUM AMBIL SOAL (ANTI-MACET)
+function validasiSebelumMulai() {
+    const inputToken = document.getElementById('token-ujian').value.trim();
+    const selectPertemuan = document.getElementById('pertemuan');
+    const btnLanjut = document.getElementById('btn-lanjut');
+    const inputId = document.getElementById('nisn').value.trim();
 
-// 1. Pemicu saat siswa mulai membuka halaman ujian
-function mulaiUjian() {
-  const idSiswaAktif = document.getElementById('nisn').value.trim();
-  
-  if (idSiswaAktif) {
-    const url = `${API_URL}?action=siswaUpdateLog&idSiswa=${idSiswaAktif}&statusUjian=${encodeURIComponent("Sedang Ujian")}&kecurangan=-&sanksi=-`;
-    
-    // Menggunakan keepalive agar request diprioritaskan oleh browser
-    fetch(url, { method: "GET", keepalive: true })
-      .then(() => console.log("Log: Siswa berhasil masuk status Sedang Ujian."));
-  }
-}
-
-// 2. SISTEM OTOMATIS ANTI-TAB SWITCHING (DETEKSI CURANG JAMINAN TERKIRIM)
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    const idSiswaAktif = document.getElementById('nisn').value.trim();
-    
-    if (idSiswaAktif) {
-      const pesanCurang = "Keluar dari Tab Ujian";
-      const sanksi = "Peringatan 1";
-      const url = `${API_URL}?action=siswaUpdateLog&idSiswa=${idSiswaAktif}&statusUjian=${encodeURIComponent("Meninggalkan Ujian")}&kecurangan=${encodeURIComponent(pesanCurang)}&sanksi=${encodeURIComponent(sanksi)}`;
-      
-      // Mengirimkan data terlebih dahulu secara paksa ke Google Sheets
-      fetch(url, { method: "GET", keepalive: true })
-        .then(response => {
-          console.log("Log kecurangan berhasil dikirim ke server.");
-          // Peringatan dimunculkan setelah sistem selesai mengirim data
-          alert("PERINGATAN: Anda terdeteksi meninggalkan halaman ujian! Aktivitas Anda telah dilaporkan ke Panel Admin Guru.");
-        })
-        .catch(err => console.error("Gagal mengirim log kecurangan:", err));
+    // 1. Validasi Token/Kata Kunci bawaan Anda
+    if (tokenKunciDinamis !== "" && inputToken !== tokenKunciDinamis) {
+        return alert("Kata Kunci / Token Ujian yang Anda masukkan salah!");
     }
-  }
-});
 
-// 3. Pemicu saat siswa selesai mengirimkan lembar jawaban
-function selesaiUjian() {
-  const idSiswaAktif = document.getElementById('nisn').value.trim();
-  
-  if (idSiswaAktif) {
-    const url = `${API_URL}?action=siswaUpdateLog&idSiswa=${idSiswaAktif}&statusUjian=${encodeURIComponent("Selesai")}&kecurangan=-&sanksi=-`;
-    
-    fetch(url, { method: "GET", keepalive: true })
-      .then(() => console.log("Log: Status Selesai berhasil diperbarui."));
-  }
+    // Ambil nama kolom yang akan dituju (Contoh: "Asesmen Sumatif 1")
+    const namaKolomUjian = selectPertemuan.options[selectPertemuan.selectedIndex].getAttribute('data-kolom');
+
+    // Ubah tampilan tombol agar siswa tahu sistem sedang memverifikasi data
+    btnLanjut.innerText = "Memvalidasi Akses...";
+    btnLanjut.disabled = true;
+
+    // 2. Ketuk pintu server (Kode.gs) untuk memastikan siswa belum punya nilai di kolom tersebut
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ 
+            action: "cekSiswa", 
+            idSiswa: inputId,
+            kolomLatihan: namaKolomUjian // Mengirimkan "Asesmen Sumatif X" ke server
+        })
+    })
+    .then(response => response.json())
+    .then(res => {
+        // Kembalikan status tombol ke normal jika pengecekan selesai
+        btnLanjut.innerText = "Mulai Ujian";
+        btnLanjut.disabled = false;
+
+        if (res.status === "success") {
+            // JIKA TERDETEKSI SUDAH PERNAH UJIAN (BLOKIR MUTLAK)
+            if (res.sudahUjian) {
+                alert(res.message); // Menampilkan: "Maaf [Nama], Anda sudah memiliki riwayat nilai..."
+                return; // Stop di sini! Siswa tidak akan bisa masuk ke lembar soal
+            }
+
+            // JIKA LOLOS (Belum pernah ujian), LANJUTKAN KE FUNGSI ASLI ANDA
+            ambilSoalDariDoc();
+        } else {
+            alert("Gagal memvalidasi status akses: " + res.message);
+        }
+    })
+    .catch(err => {
+        btnLanjut.innerText = "Mulai Ujian";
+        btnLanjut.disabled = false;
+        alert("Terjadi kesalahan jaringan saat memverifikasi status ujian.");
+        console.error(err);
+    });
+}
+// 4. FUNGSI MENGAMBIL ISI KONTEN GOOGLE DOCS
+
+// 4. FUNGSI MENGAMBIL ISI KONTEN GOOGLE DOCS (SUDAH DISISIPKAN LOG MASUK UJIAN)
+function ambilSoalDariDoc() {
+    const selectPertemuan = document.getElementById('pertemuan');
+    const idDoc = selectPertemuan.value ? selectPertemuan.value.trim() : "";
+    const menitUjian = parseInt(selectPertemuan.options[selectPertemuan.selectedIndex].getAttribute('data-durasi')) || 60;
+
+    if (!statusSiswaValid) return alert('ID Siswa belum terverifikasi!');
+    if (!idDoc) return alert('Mohon pilih paket ujian terlebih dahulu!');
+
+    // Sediakan data siswa untuk dipakai nanti
+    const inputId = document.getElementById('nisn').value.trim();
+    const namaKolomUjian = selectPertemuan.options[selectPertemuan.selectedIndex].getAttribute('data-kolom');
+
+    infoSiswa = {
+        idSiswa: inputId,
+        kolomLatihan: namaKolomUjian
+    };
+
+    document.getElementById('btn-lanjut').innerText = "Memuat Soal...";
+    document.getElementById('btn-lanjut').disabled = true;
+
+    // Langkah A: Ambil Konten Soal dari Google Docs
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "getDocContent", idDoc: idDoc })
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.status === "success") {
+            
+            // =================================================================
+            // TAMBAHAN: KIRIM LOG "masuk_ujian" AGAR MONITOR MONITOR PENGAWAS BERUBAH
+            // =================================================================
+            console.log("Soal termuat. Mengirim status aktivitas ke pengawas...");
+            
+            fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors", // Digunakan agar tidak terhambat CORS di localhost / Live Server
+                body: JSON.stringify({
+                    action: "masuk_ujian", // Menembak target Aksi Baru di doPost(e)
+                    idSiswa: inputId,
+                    kolomLatihan: namaKolomUjian,
+                    status: "Sedang Ujian",
+                    gps: "Lokasi Terlacak"
+                })
+            }).catch(errLog => console.error("Gagal mengirim log aktivitas, namun ujian tetap dilanjutkan:", errLog));
+            // =================================================================
+
+            // Langkah B: Tampilkan Soal dan Buka Halaman Ujian (Kode Asli Anda)
+            parseTeksMenjadiSoal(res.content);
+            document.getElementById('section-identitas').classList.remove('page-active');
+            document.getElementById('section-ujian').classList.add('page-active');
+            sedangUjian = true; 
+            mulaiHitungMundur(menitUjian); // Jalankan countdown dinamis per baris
+
+        } else {
+            alert("Gagal memuat dokumen soal.");
+            document.getElementById('btn-lanjut').innerText = "Mulai Ujian";
+            document.getElementById('btn-lanjut').disabled = false;
+        }
+    })
+    .catch(err => {
+        alert("Terjadi kesalahan jaringan saat memuat soal.");
+        document.getElementById('btn-lanjut').innerText = "Mulai Ujian";
+        document.getElementById('btn-lanjut').disabled = false;
+        console.error(err);
+    });
 }
 
 
+// 5. PARSER SOAL VISUAL - LENGKAP DENGAN DETEKSI GAMBAR OTOMATIS (FIX)
+function parseTeksMenjadiSoal(teksPenuh) {
+    const containerBox = document.getElementById('box-soal-cbt');
+    containerBox.innerHTML = ""; 
+    kunciJawabanAsli = [];
+    
+    // Pecah dokumen berdasarkan penanda [Soal 1], [Soal 2], dst
+    const islands = teksPenuh.split(/\[Soal\s*\d+\]/i);
+    let nomorUrut = 1;
+
+    for (let i = 1; i < islands.length; i++) {
+        let teksBlok = islands[i].trim();
+        if (!teksBlok) continue;
+
+        // Mengambil index dari hasil match agar murni berupa teks sebelum di-trim
+        let barisKunci = teksBlok.match(/Kunci[\s\xA0]*:[\s\xA0]*(.*)/i);
+        let kunciBersih = (barisKunci && barisKunci[1]) ? barisKunci[1].trim() : "";
+        kunciJawabanAsli.push(kunciBersih);
+
+        let barisBarisRaw = teksBlok.split("\n").map(b => b.trim()).filter(b => b !== "");
+        let kalimatPertanyaanArr = []; 
+        let daftarOpsi = [];
+
+        for (let j = 0; j < barisBarisRaw.length; j++) {
+            let barisAktif = barisBarisRaw[j];
+            if (/^Kunci/i.test(barisAktif) || barisAktif.toUpperCase().includes("KUNCI")) continue; 
+            
+            let opsiMatch = barisAktif.match(/^([A-E])\s*[\)[\]|\.]\s*(.*)/i);
+            if (opsiMatch) {
+                daftarOpsi.push({ huruf: opsiMatch[1].toUpperCase(), teksOpsi: opsiMatch[2] });
+            } else {
+                kalimatPertanyaanArr.push(barisAktif);
+            }
+        }
+
+        // --- LOGIKA UTAMA DETEKSI FORMAT GAMBAR ---
+        let teksPertanyaanPenuh = kalimatPertanyaanArr.join("<br>");
+        
+        // Deteksi pola [GAMBAR:https://...] atau [GAMBAR:http://...]
+        const regexGambar = /\[GAMBAR:\s*(https?:\/\/[^\s\]]+)\s*\]/gi;
+        
+        // Ubah teks pola [GAMBAR:URL] menjadi elemen tag HTML <img> asli agar foto muncul
+        teksPertanyaanPenuh = teksPertanyaanPenuh.replace(regexGambar, function(match, urlGambar) {
+            return `<br><img src="${urlGambar}" style="width:100%; max-width:400px; height:auto; border-radius:10px; margin:10px 0; border:1px solid #e2e8f0; display:block;" alt="Gambar Soal"><br>`;
+        });
+
+        let htmlSoal = `<div class="soal-card"><div class="soal-teks">${nomorUrut}. ${teksPertanyaanPenuh}</div><div class="pilihan-container">`;
+        if (daftarOpsi.length === 0) {
+            htmlSoal += `<textarea name="soal_${nomorUrut}" data-tipe="essay" rows="4" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc;" placeholder="Ketik jawaban esai..."></textarea>`;
+        } else {
+            daftarOpsi.forEach(opsi => {
+                htmlSoal += `<label class="pilihan-item"><input type="radio" name="soal_${nomorUrut}" data-tipe="pg" value="${opsi.huruf}"> <span>${opsi.huruf}. ${opsi.teksOpsi}</span></label>`;
+            });
+        }
+        htmlSoal += `</div></div>`;
+        containerBox.innerHTML += htmlSoal;
+        nomorUrut++;
+    }
+}
+
+
+// 6. ENGINE JAM DIGITAL HITUNG MUNDUR
+function mulaiHitungMundur(durasiMenit) {
+    const timerDisplay = document.getElementById('countdown-timer');
+    timerDisplay.style.display = 'block';
+    let waktuDetik = durasiMenit * 60;
+
+    timerInterval = setInterval(() => {
+        let menit = Math.floor(waktuDetik / 60);
+        let detik = waktuDetik % 60;
+
+        menit = menit < 10 ? "0" + menit : menit;
+        detik = detik < 10 ? "0" + detik : detik;
+
+        timerDisplay.innerText = "Sisa Waktu: " + menit + ":" + detik;
+
+        if (waktuDetik <= 0) {
+            clearInterval(timerInterval);
+            sedangUjian = false;
+            alert("Waktu habis! Jawaban Anda akan otomatis dikirimkan ke server.");
+            kirimJawabanOtomatisSelesai(); 
+        }
+        waktuDetik--;
+    }, 1000);
+}
+
+// 7. DETEKSI ANTI-CURANG PINDAH TAB (SUDAH TERINTEGRASI KE SHEET LOG)
+// 7. DETEKSI ANTI-CURANG PINDAH TAB (VERSI FORM-DATA AMAN NO-CORS)
+document.addEventListener("visibilitychange", () => {
+  
+  // Ganti kode di dalam document.addEventListener("visibilitychange") menjadi format JSON:
+if (document.hidden && sedangUjian) {
+  jumlahPelanggaran++; 
+  const inputId = document.getElementById('nisn').value.trim(); 
+  if (inputId) {
+    fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "update_kecurangan_realtime",
+        idSiswa: inputId,
+        pelanggaran: jumlahPelanggaran
+      })
+    })
+    .then(() => console.log("Data kecurangan berhasil dikirim ke server: " + jumlahPelanggaran))
+    .catch(err => console.error("Gagal mengirim data kecurangan:", err));
+  }
+  alert(`PERINGATAN KECURANGAN!\nAnda terdeteksi meninggalkan halaman ujian sebanyak ${jumlahPelanggaran} kali. Aktivitas ini dilaporkan ke guru!`);
+}
+
+
+});
+// 8. CEK VALIDASI PENGISIAN SOAL
+function hitungDanKirimNilai() {
+    let totalSoal = kunciJawabanAsli.length;
+    for (let i = 0; i < totalSoal; i++) {
+        let nomorSoal = i + 1;
+        let radioChecked = document.querySelector(`input[name="soal_${nomorSoal}"]:checked`);
+        let elemenUraian = document.querySelector(`textarea[name="soal_${nomorSoal}"]`);
+        let apakahIniSoalPG = document.querySelector(`input[type="radio"][name="soal_${nomorSoal}"]`);
+
+        if (apakahIniSoalPG && !radioChecked) return alert(`Soal nomor ${nomorSoal} belum diisi!`);
+        if (elemenUraian && elemenUraian.value.trim() === "") return alert(`Soal nomor ${nomorSoal} belum diisi!`);
+    }
+
+    if (!confirm("Apakah Anda yakin ingin menyelesaikan ujian?")) return;
+    kirimJawabanOtomatisSelesai();
+}
+
+function kirimJawabanOtomatisSelesai() {
+    clearInterval(timerInterval); 
+    sedangUjian = false; 
+    
+    let benarPG = 0; 
+    let totalPG = 0; 
+    let dataSoalUraian = [];
+    let totalSoal = kunciJawabanAsli.length;
+
+    for (let i = 0; i < totalSoal; i++) {
+        let nomorSoal = i + 1;
+        let radioChecked = document.querySelector(`input[name="soal_${nomorSoal}"]:checked`);
+        let elemenUraian = document.querySelector(`textarea[name="soal_${nomorSoal}"]`);
+
+        // KOREKSI PG: Menghitung total soal PG dan mencocokkan huruf kunci jawaban
+        if (document.querySelector(`input[type="radio"][name="soal_${nomorSoal}"]`)) {
+            totalPG++; 
+            if (radioChecked && kunciJawabanAsli[i]) {
+                if (radioChecked.value.trim().toUpperCase() === kunciJawabanAsli[i].trim().toUpperCase()) {
+                    benarPG++;
+                }
+            }
+        } 
+        // KOREKSI ESAI: Mengumpulkan jawaban uraian siswa untuk dicocokkan kata kuncinya
+        else if (elemenUraian) {
+            let elemenCard = elemenUraian.closest('.soal-card');
+            let teksPertanyaan = "Soal Uraian " + nomorSoal;
+            if (elemenCard && elemenCard.querySelector('.soal-teks')) {
+                teksPertanyaan = elemenCard.querySelector('.soal-teks').innerText.replace(/^\d+\.\s*/, "");
+            }
+            dataSoalUraian.push({ 
+                pertanyaan: teksPertanyaan, 
+                kunciPanduan: kunciJawabanAsli[i], 
+                jawabanSiswa: elemenUraian.value.trim() 
+            });
+        }
+    }
+
+    let nilaiMurniPG = totalPG > 0 ? (benarPG / totalPG) * 100 : 0;
+    document.getElementById('box-soal-cbt').innerHTML = "<div style='text-align:center; padding:40px;'><b>Sistem sedang mengunci dan mengirim nilai Anda ke spreadsheet...</b></div>";
+
+    // MENGIRIM DATA UTUH KE SERVER SPREADSHEET
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+            action: "prosesNilaiDanEssayAI", 
+            idSiswa: document.getElementById('nisn').value.trim(),
+            kolomLatihan: infoSiswa.kolomLatihan,
+            nilaiPG: nilaiMurniPG,
+            dataEssay: dataSoalUraian,
+            pelanggaran: jumlahPelanggaran 
+        })
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.status === "success") {
+            alert(`Asesmen Selesai!\n\nNilai PG: ${res.nilaiPG}\nNilai Esai (Kata Kunci): ${res.nilaiEssay}\nNilai Total Gabungan: ${res.nilaiTotal}\nTotal Kecurangan: ${jumlahPelanggaran} kali.`);
+            location.reload();
+        } else {
+            alert("Gagal memproses nilai ke spreadsheet server.");
+            document.getElementById('box-soal-cbt').innerHTML = "<h3>Terjadi kesalahan server. Silakan hubungi pengawas.</h3>";
+        }
+    })
+
+    .catch(err => {
+        alert("Koneksi internet terputus saat mengirim nilai!");
+        document.getElementById('box-soal-cbt').innerHTML = "<h3>Koneksi gagal. Jangan tutup halaman ini, periksa Wi-Fi Anda!</h3>";
+    });
+}
 </script>
 </body>
 </html>

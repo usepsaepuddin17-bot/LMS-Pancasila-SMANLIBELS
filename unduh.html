@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unduh Rekap Nilai Siswa</title>
+    
+    <!-- 1. PUSTAKA WAJIB: Pustaka ini yang membuat perintah XLSX.utils Anda berfungsi! -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+            background-color: #f0f4f8; 
+            padding: 20px 12px;
+            display: flex;
+            justify-content: center;
+        }
+        .main-container {
+            width: 100%;
+            max-width: 750px; 
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid #dcdcdc;
+            overflow: hidden;
+            padding-bottom: 20px;
+        }
+        .dashboard-header { 
+            background: #0d5c75; 
+            color: white;
+            padding: 24px 20px; 
+            text-align: center;
+            border-bottom: 4px solid #074356;
+        }
+        .dashboard-header h1 { font-size: 15px; font-weight: bold; margin-bottom: 4px; }
+        .dashboard-header h2 { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+        .dashboard-header p { font-size: 13px; opacity: 0.9; }
+        .content-body { padding: 20px; }
+        .section-title { font-size: 14px; font-weight: bold; color: #0d5c75; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .control-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+        .control-group label { font-size: 13px; font-weight: bold; color: #495057; }
+        select { width: 100%; padding: 11px; font-size: 14px; border-radius: 6px; border: 1px solid #cccccc; background-color: #fff; }
+        .table-wrapper { width: 100%; overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; background: #fff; }
+        .data-table th, .data-table td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+        .data-table th { background-color: #f8fafc; color: #0d5c75; font-weight: bold; border-bottom: 2px solid #0d5c75; }
+        .data-table tr:hover { background-color: #f1f5f9; }
+        .btn-container { display: flex; gap: 10px; margin-top: 25px; }
+        .btn { flex: 1; padding: 13px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; text-align: center; text-decoration: none; cursor: pointer; }
+        .btn-excel { background-color: #1e7e34; color: white; }
+        .btn-excel:disabled { background-color: #8cc39b; cursor: not-allowed; }
+        .btn-back { background-color: #6c757d; color: white; }
+        .empty-state { text-align: center; padding: 30px; color: #777; font-size: 13px; background: #f8fafc; border-radius: 8px; border: 1px dashed #ccc; }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="dashboard-header">
+        <h1>SMA NEGERI 15 MALUKU TENGAH</h1>
+        <h2>PENDIDIKAN PANCASILA</h2>
+        <p>Guru: Usep Saepudin, M.Pd</p>
+    </div>
+    <div class="content-body">
+        <div class="section-title">Unduh Rekap Nilai per Kelas</div>
+        <div class="control-group">
+            <label for="classDownloadFilter">Pilih Kelas Rekap :</label>
+            <!-- Menambahkan pemicu muatRekapKelas() saat pilihan berubah -->
+            <select id="classDownloadFilter" onchange="muatRekapKelas()">
+                <option value="">-- Pilih Kelas --</option>
+            </select>
+        </div>
+        <div class="table-wrapper">
+            <table class="data-table" id="previewTable">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>ID Siswa</th>
+                        <th>Nama</th>
+                        <th>Tugas</th>
+                        <th>LKPD</th>
+                        <th>Asesmen</th>
+                        <th>Keaktifan</th>
+                        <th>Kategori</th>
+                        <th>H</th>
+                        <th>I</th>
+                        <th>S</th>
+                        <th>A</th>
+                        <th>Est Rapot</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="13" class="empty-state">Silakan pilih kelas untuk memuat tabel rekap.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="btn-container">
+            <a href="admin.html" class="btn btn-back">Kembali</a>
+            <button class="btn btn-excel" id="btnDownload" onclick="unduhExcel()" disabled>Unduh File Excel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyEz9Yicnwkeuh8PMNSG36_58Fwdjug5eoNzpq-VasA8_YoX5BBtF_BchrZFArsOHP7wg/exec"; 
+    let dataRapotGlobal = [];
+
+    window.onload = function() {
+        ambilSemuaDataRapot();
+    };
+
+    function ambilSemuaDataRapot() {
+        fetch(`${WEB_APP_URL}?action=readAllRapot`)
+            .then(res => res.json())
+            .then(data => {
+                if (!data || data.error || !Array.isArray(data)) return;
+                dataRapotGlobal = data;
+                isiFilterKelas(data);
+            })
+            .catch(err => console.error("Gagal mengambil data dari Google Sheets:", err));
+    }
+
+    function isiFilterKelas(data) {
+        const select = document.getElementById("classDownloadFilter");
+        if (!select) return;
+        
+        // Bersihkan opsi bawaan agar tidak duplikat/menumpuk data lama
+        select.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+        
+        const kelasUnik = [...new Set(data.map(item => item.kelas))].filter(Boolean);
+        kelasUnik.forEach(kelas => {
+            let opt = document.createElement("option");
+            opt.value = kelas;
+            opt.textContent = kelas;
+            select.appendChild(opt);
+        });
+    }
+
+    function muatRekapKelas() {
+        const kelasTerpilih = document.getElementById("classDownloadFilter").value;
+        const tbody = document.getElementById("tableBody");
+        const btnDownload = document.getElementById("btnDownload");
+        if (!tbody || !btnDownload) return;
+        tbody.innerHTML = "";
+
+        if (!kelasTerpilih) {
+            tbody.innerHTML = `<tr><td colspan="13" class="empty-state">Silakan pilih kelas untuk memuat tabel rekap.</td></tr>`;
+            btnDownload.disabled = true;
+            return;
+        }
+
+        const siswaFiltered = dataRapotGlobal.filter(item => item.kelas === kelasTerpilih);
+        if (siswaFiltered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="13" class="empty-state">Tidak ada data siswa untuk kelas ini.</td></tr>`;
+            btnDownload.disabled = true;
+            return;
+        }
+
+        siswaFiltered.forEach((siswa, index) => {
+            let tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${siswa.id || '-'}</td>
+                <td style="font-weight:bold;">${siswa.nama || '-'}</td>
+                <td>${siswa.tugas || 0}</td>
+                <td>${siswa.lkpd || 0}</td>
+                <td>${siswa.asesmen || 0}</td>
+                <td>${siswa.nilaiAktif || 0}</td>
+                <td>${siswa.katAktif || '-'}</td>
+                <td>${siswa.hadir || 0}</td>
+                <td>${siswa.izin || 0}</td>
+                <td>${siswa.sakit || 0}</td>
+                <td>${siswa.alfa || 0}</td>
+                <td style="font-weight:bold; color:#1e7e34;">${siswa.estimasiRapot || 0}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        btnDownload.disabled = false;
+    }
+
+function unduhExcel() {
+    const kelasTerpilih = document.getElementById("classDownloadFilter").value;
+    if (!kelasTerpilih) return alert("Pilih kelas terlebih dahulu!");
+
+    const siswaFiltered = dataRapotGlobal.filter(item => item.kelas === kelasTerpilih);
+    if (siswaFiltered.length === 0) return alert("Tidak ada data untuk diunduh!");
+    
+    // Susunan Header Kolom Excel asli
+    const barisExcel = [
+        ["REKAPITULASI ESTIMASI NILAI RAPOT SISWA"],
+        ["SMA NEGERI 15 MALUKU TENGAH"],
+        ["Mata Pelajaran: Pendidikan Pancasila"],
+        ["Guru Pengampu: Usep Saepudin, M.Pd"],
+        [`Kelas: ${kelasTerpilih}`],
+        [], 
+        ["NO", "ID SISWA", "NAMA SISWA", "RATA TUGAS", "RATA LKPD", "RATA ASESMEN", "NILAI KEAKTIFAN", "KATEGORI KEAKTIFAN", "HADIR", "IZIN", "SAKIT", "ALFA", "ESTIMASI NILAI RAPOT"]
+    ];
+
+    // Sinkronisasi variabel dengan data dari kode.gs
+    siswaFiltered.forEach((siswa, index) => {
+        barisExcel.push([
+            index + 1,
+            siswa.id || "-",
+            siswa.nama || "-",
+            Number(siswa.tugas) || 0,
+            Number(siswa.lkpd) || 0,
+            Number(siswa.asesmen) || 0,
+            Number(siswa.nilaiAktif) || 0, // Diperbaiki dari nilaiKeaktifan
+            siswa.katAktif || "-",         // Diperbaiki dari kategori
+            Number(siswa.hadir) || 0,
+            Number(siswa.izin) || 0,
+            Number(siswa.sakit) || 0,
+            Number(siswa.alfa) || 0,
+            Number(siswa.estimasiRapot) || 0 // Diperbaiki dari estimasiNilaiRapot
+        ]);
+    });
+
+    // Proses konversi menjadi File Excel asli (.xlsx) menggunakan SheetJS
+    try {
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(barisExcel);
+        
+        // Merge judul baris 1 dan baris 2 agar rapi di Excel
+        ws['!merges'] = [
+            { s: { r: 0, c: 0 }, e: { r: 0, c: 12 } }, 
+            { s: { r: 1, c: 0 }, e: { r: 1, c: 12 } }
+        ];
+        
+        XLSX.utils.book_append_sheet(wb, ws, `Kelas ${kelasTerpilih}`);
+        XLSX.writeFile(wb, `Rekap_Nilai_Pancasila_Kelas_${kelasTerpilih}.xlsx`);
+    } catch (error) {
+        console.error("Gagal membuat file Excel:", error);
+        alert("Terjadi kesalahan sistem saat membuat file Excel.");
+    }
+}
+</script>
+
+</body>
+</html>

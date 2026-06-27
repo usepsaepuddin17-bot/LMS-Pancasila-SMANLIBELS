@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Estimasi Nilai Rapot</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+            background-color: #f0f4f8; 
+            padding: 20px 12px;
+            display: flex;
+            justify-content: center;
+        }
+        .main-container {
+            width: 100%;
+            max-width: 550px; 
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid #dcdcdc;
+            overflow: hidden;
+            padding-bottom: 20px;
+        }
+        .dashboard-header { 
+            background: #0d5c75; 
+            color: white; 
+            padding: 24px 20px; 
+            text-align: center;
+            border-bottom: 4px solid #074356;
+        }
+        .dashboard-header h1 { font-size: 15px; font-weight: bold; margin-bottom: 4px; }
+        .dashboard-header h2 { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+        .dashboard-header p { font-size: 13px; opacity: 0.9; }
+        
+        .content-body { padding: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+        .control-group label { font-size: 13px; font-weight: bold; color: #495057; }
+        
+        input[type="text"] { 
+            width: 100%; padding: 12px; font-size: 15px; border-radius: 8px; 
+            border: 1px solid #cccccc; background-color: #fff; text-align: center; font-weight: bold;
+        }
+        
+        .btn { 
+            width: 100%; padding: 14px; border: none; border-radius: 8px; 
+            font-size: 15px; font-weight: bold; text-align: center; text-decoration: none; cursor: pointer; display: block;
+        }
+        .btn-search { background-color: #0d5c75; color: white; margin-top: 10px; }
+        .btn-back { background-color: #6c757d; color: white; margin-top: 25px; }
+
+        /* JENDELA POP-UP (MODAL) */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; 
+            width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); 
+            padding: 16px; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background-color: white; width: 100%; max-width: 480px; 
+            border-radius: 12px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-header { background: #0d5c75; color: white; padding: 16px; text-align: center; font-weight: bold; font-size: 16px; }
+        .modal-body { padding: 16px; max-height: 70vh; overflow-y: auto; }
+        
+        /* Gaya Baris Nilai Rapot */
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; font-size: 14px; }
+        .info-row.header-row { background: #f8fafc; padding: 8px; border-bottom: 2px solid #0d5c75; font-weight: bold; color: #0d5c75; margin-top: 10px; }
+        .info-row .label { color: #555; }
+        .info-row .value { font-weight: bold; color: #111; }
+        .score-big { text-align: center; padding: 15px; background: #e2f0d9; color: #28a745; border-radius: 8px; font-size: 24px; font-weight: 900; margin-bottom: 15px; border: 1px solid #c3e6cb; }
+        
+        .btn-close { background-color: #dc3545; color: white; margin-top: 15px; padding: 10px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Dasbor Atas -->
+        <div class="dashboard-header">
+            <h1>SMA NEGERI 15 MALUKU TENGAH</h1>
+            <h2>PENDIDIKAN PANCASILA</h2>
+            <p>Guru: Usep Saepudin, M.Pd</p>
+        </div>
+
+        <div class="content-body">
+            <!-- Form Cari ID -->
+            <div class="control-group">
+                <label for="studentIdInput">Masukkan ID Siswa Anda :</label>
+                <input type="text" id="studentIdInput" placeholder="Contoh: 123456" autocomplete="off">
+                <button class="btn btn-search" onclick="cariRapotSiswa()">Lihat Estimasi Nilai</button>
+            </div>
+
+            <!-- Dasbor Bawah: Kembali ke index.html -->
+            <a href="index.html" class="btn btn-back">Kembali ke Beranda</a>
+        </div>
+    </div>
+
+    <!-- JENDELA POP-UP (MODAL DATA RAPOT) -->
+    <div id="rapotModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">HASIL ESTIMASI NILAI RAPOT</div>
+            <div class="modal-body" id="modalDataBody">
+                <!-- Data hasil pencarian akan disuntikkan ke sini oleh JavaScript -->
+            </div>
+        </div>
+    </div>
+
+        <script>
+        // GANTI dengan URL Web App Google Apps Script Anda
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby6P6NUp6U-dl0v2C2N7RUGPRDkAkEcbmhOpY1Y7edmlp32IuQg6x-U7nRIztO0Awrd/exec"; 
+
+        function cariRapotSiswa() {
+            const idInput = document.getElementById("studentIdInput").value.trim();
+            if (!idInput) return alert("Silakan ketik ID Siswa terlebih dahulu!");
+
+            const btnSearch = document.querySelector('.btn-search');
+            btnSearch.innerText = "Mencari Data...";
+            btnSearch.disabled = true;
+
+            // Memanggil Google Sheet melalui backend Apps Script
+            fetch(`${WEB_APP_URL}?action=readRapot&idSiswa=${encodeURIComponent(idInput)}`)
+                .then(res => res.json())
+                .then(siswa => {
+                    btnSearch.innerText = "Lihat Estimasi Nilai";
+                    btnSearch.disabled = false;
+
+                    if (siswa.error) {
+                        alert("ID Siswa tidak ditemukan! Periksa kembali penulisan ID Anda.");
+                        return;
+                    }
+
+                    // Tampilkan Jendela POP UP dan isi datanya
+                    bukaPopUpRapot(siswa);
+                })
+                .catch(err => {
+                    alert("Gagal terhubung ke server: " + err);
+                    btnSearch.innerText = "Lihat Estimasi Nilai";
+                    btnSearch.disabled = false;
+                });
+        }
+
+                function bukaPopUpRapot(data) {
+            const modalBody = document.getElementById("modalDataBody");
+            
+            // Mengatur susunan tampilan informasi di dalam jendela Pop Up
+            modalBody.innerHTML = `
+                <div class="info-row"><span class="label">Nama Siswa:</span><span class="value">${data.nama}</span></div>
+                <div class="info-row"><span class="label">Kelas:</span><span class="value">${data.kelas}</span></div>
+                <div class="info-row"><span class="label">ID Siswa:</span><span class="value">${data.id}</span></div>
+                
+                <div class="info-row header-row">KOMPONEN NILAI</div>
+                <div class="info-row"><span class="label">Rata-rata Tugas:</span><span class="value">${data.tugas}</span></div>
+                <div class="info-row"><span class="label">Rata-rata LKPD:</span><span class="value">${data.lkpd}</span></div>
+                <div class="info-row"><span class="label">Rata-rata Asesmen:</span><span class="value">${data.asesmen}</span></div>
+                <div class="info-row"><span class="label">Nilai Keaktifan:</span><span class="value">${data.nilaiAktif}</span></div>
+                <div class="info-row"><span class="label">Kategori Keaktifan:</span><span class="value">${data.katAktif}</span></div>
+                
+                <div class="info-row header-row">PRESENSI / KEHADIRAN</div>
+                <div class="info-row"><span class="label">Hadir:</span><span class="value">${data.hadir} Hari</span></div>
+                <div class="info-row"><span class="label">Izin:</span><span class="value">${data.izin} Hari</span></div>
+                <div class="info-row"><span class="label">Sakit:</span><span class="value">${data.sakit} Hari</span></div>
+                <div class="info-row"><span class="label">Alfa:</span><span class="value">${data.alfa} Hari</span></div>
+                
+                <div class="info-row header-row">TOTAL AKHIR</div>
+                <div class="score-big">${data.estimasiRapot}</div>
+                
+                <button class="btn btn-close" onclick="tutupPopUpRapot()">Tutup Jendela</button>
+            `;
+            
+            document.getElementById("rapotModal").style.display = "flex";
+        }
+
+
+        function tutupPopUpRapot() {
+            document.getElementById("rapotModal").style.display = "none";
+        }
+    </script>
+</body>
+</html>
